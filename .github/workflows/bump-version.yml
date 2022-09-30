@@ -18,14 +18,13 @@ jobs:
           git config user.name "GitHub Bot"
           git config user.email "gituser@example.com"
       - run: echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > ./.npmrc
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "16.x"
-          cache: 'yarn'
+          cache: "yarn"
       - name: Check example apps
-        run: echo "EXAMPLE_APPS=$(ls ./examples | tr '\n' ',')" >> $GITHUB_ENV
+        run: echo "EXAMPLE_APPS=$(ls ./src | tr '\n' ',')" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --prefer-offline
@@ -67,4 +66,3 @@ jobs:
           branch: ${{ github.ref }}
           force: true
           tags: true
-

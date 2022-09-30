@@ -2,7 +2,7 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "npmScope": "near-wallet-selector",
   "workspaceLayout": {
-    "appsDir": "examples",
+    "appsDir": "src",
     "libsDir": "packages"
   },
   "affected": {
@@ -17,16 +17,23 @@
   },
   "tasksRunnerOptions": {
     "default": {
-      "runner": "@nrwl/nx-cloud",
+      "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"],
-        "accessToken": "NzY1ODVkMGItMTVlNC00MzQxLWJkYmQtZGFkNzY0YmFmODA3fHJlYWQtd3JpdGU="
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e"
+        ],
+        "parallel": 5
       }
     }
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
   "generators": {
@@ -49,19 +56,6 @@
         "style": "scss",
         "linter": "eslint"
       }
-    },
-    "@nrwl/angular:application": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "none",
-      "e2eTestRunner": "none"
-    },
-    "@nrwl/angular:library": {
-      "linter": "eslint",
-      "unitTestRunner": "none"
-    },
-    "@nrwl/angular:component": {
-      "style": "scss"
     }
   },
   "defaultProject": "react"
