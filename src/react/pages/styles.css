@@ -4,7 +4,7 @@
 
 @import "../../../node_modules/@near-wallet-selector/modal-ui/styles.css";
 
-html {
+/* html {
   --bg: #fff;
   --fg: #25282A;
   --gray: #888;
@@ -141,4 +141,4 @@ button:active {
   border-left: 0.25em solid var(--secondary);
   padding-left: 0.25em;
   margin-left: -0.5em;
-}
+} */

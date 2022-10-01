@@ -5,15 +5,16 @@ import type {
   CodeResult,
 } from "near-api-js/lib/providers/provider";
 import { Transaction } from "@near-wallet-selector/core";
-
 import type { Account, Donate, Message } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
 import { CONTRACT_ID } from "../constants";
 import SignIn from "./SignIn";
-import Form from "./Form";
+import FormInput from "./FormInput";
 import Messages from "./Messages";
 import Greeting from "./Greeting";
 import Donates from "./Donates";
+import { retryWhen } from "rxjs";
+import { Container, Row, Col } from 'react-bootstrap';
 
 const SUGGESTED_DONATION = "0";
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
@@ -27,6 +28,7 @@ const Content: React.FC = () => {
   const [donates, setDonates] = useState<Array<Donate>>([]);
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
+    console.log("Call getAccount.");
     if (!accountId) {
       return null;
     }
@@ -48,7 +50,7 @@ const Content: React.FC = () => {
 
   const updateGreeting = useCallback(
     async (message: string) => {
-      console.log(greeting)
+      console.log("Call updateGreeting.");
       const { contract } = selector.store.getState();
       const wallet = await selector.wallet();
       return wallet
@@ -77,6 +79,7 @@ const Content: React.FC = () => {
 
   const donate = useCallback(
     async (message: string, donation: string) => {
+      console.log("Call Donate.");
       const { contract } = selector.store.getState();
       const wallet = await selector.wallet();
       return wallet
@@ -104,6 +107,7 @@ const Content: React.FC = () => {
     }, [selector]);
 
   const getDonates = useCallback(() => {
+    console.log("Call getDonates.");
     const { network } = selector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
     const params: string = '{"from_index":0,"limit":50}';
@@ -123,6 +127,7 @@ const Content: React.FC = () => {
   }, [selector]);
 
   const getMessages = useCallback(() => {
+    console.log("Call getMessages.");
     const { network } = selector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
 
@@ -138,6 +143,7 @@ const Content: React.FC = () => {
   }, [selector]);
 
   const getGreeting = useCallback(() => {
+    console.log("Call getGreeting.");
     const { network } = selector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
 
@@ -153,16 +159,19 @@ const Content: React.FC = () => {
   }, [selector]);
 
   useEffect(() => {
+    console.log("Call useEffect1.");
     // TODO: don't just fetch once; subscribe!
     // getMessages().then(setMessages);
     getGreeting().then(setGreeting);
   }, []);
 
   useEffect(() => {
+    console.log("Call useEffect2.");
     getDonates().then(setDonates);
   }, []);
 
   useEffect(() => {
+    console.log("Call useEffect3.");
     if (!accountId) {
       return setAccount(null);
     }
@@ -322,14 +331,27 @@ const Content: React.FC = () => {
       // @ts-ignore.
       const { fieldset, message, donation, multiple } = e.target.elements;
       fieldset.disabled = true;
-      return donate(message.value, donation.value)
-        .catch((err) => {
-          console.error(err);
+      try {
+        const result = await donate(message.value, donation.value);
+        const accountView = await getAccount();
+        setAccount(accountView);
+        message.value = "";
+        fieldset.disabled = false;
+        return result;
+      } catch (err) {
+        alert("Failed to refresh messages");
+        console.log("Failed to refresh messages");
 
-          fieldset.disabled = false;
-        });
+        throw err;
+      }
+      // return donate(message.value, donation.value)
+      //   .catch((err) => {
+      //     console.error(err);
+
+      //     fieldset.disabled = false;
+      //   });
     },
-    [donate]
+    [donate, getDonates, getAccount]
   );
 
   if (loading) {
@@ -349,25 +371,37 @@ const Content: React.FC = () => {
 
   return (
     <Fragment>
-      <div>
-        <button onClick={handleSignOut}>Log out</button>
-        <button onClick={handleSwitchWallet}>Switch Wallet</button>
-        <button onClick={handleVerifyOwner}>Verify Owner</button>
-        {accounts.length > 1 && (
-          <button onClick={handleSwitchAccount}>Switch Account</button>
-        )}
-      </div>
-      {/* <Form
-        account={account}
-        onSubmit={(e) => handleSubmit(e as unknown as SubmitEvent)}
-      /> */}
-      <Form
-        account={account}
-        onSubmit={(e) => handleDonate(e as unknown as SubmitEvent)}
-      />
-      {/* <Messages messages={messages} /> */}
-      <Greeting greeting={greeting} />
-      <Donates donates={donates} />
+
+      <Container fluid="md">
+        <Row>
+          <Col>
+            <h1>Demo</h1>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <div>
+              <button onClick={handleSignOut}>Log out</button>
+              <button onClick={handleSwitchWallet}>Switch Wallet</button>
+              {/* <button onClick={handleVerifyOwner}>Verify Owner</button> */}
+              {accounts.length > 1 && (
+                <button onClick={handleSwitchAccount}>Switch Account</button>
+              )}
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <FormInput
+              account={account}
+              onSubmit={(e) => handleDonate(e as unknown as SubmitEvent)}
+            />
+            {/* <Messages messages={messages} /> */}
+            <Greeting greeting={greeting} />
+            <Donates donates={donates} />
+          </Col>
+        </Row>
+      </Container>
     </Fragment>
   );
 };

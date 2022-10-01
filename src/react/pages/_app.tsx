@@ -1,5 +1,7 @@
 import React from "react";
-import "./styles.css";
+// import "./styles.css";
+import '@near-wallet-selector/modal-ui/styles.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import favicon from "../public/favicon.ico";
@@ -17,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta property="og:title" content="Demo" />
         <meta
           property="og:description"
-          content="A guest book with comments stored on the NEAR blockchain"
+          content="Nearandrea"
         />
       </Head>
       <Component {...pageProps} />

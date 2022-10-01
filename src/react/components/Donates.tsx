@@ -8,7 +8,6 @@ interface DonatesProps {
 const Donates: React.FC<DonatesProps> = ({ donates }) => {
   return (
     <>
-      <h2>Donates</h2>
       {donates.map((donate, i) => (
         // TODO: format as cards, add timestamp
         <p key={i}>
