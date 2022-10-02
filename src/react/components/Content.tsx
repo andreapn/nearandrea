@@ -291,18 +291,14 @@ const Content: React.FC = () => {
   if (!account) {
     return (
       <Fragment>
-        <div>
-          <button onClick={handleSignIn}>Log in</button>
-        </div>
-        <SignIn />
+        <SignIn handleSignIn={() => { handleSignIn() }} />
       </Fragment>
     );
   }
 
   return (
     <Fragment>
-
-      <Container fluid="md">
+      <Container fluid="lg">
         <Modal
           size="sm"
           show={modalShow}
@@ -316,14 +312,14 @@ const Content: React.FC = () => {
           </Modal.Header>
           <Modal.Body>{error}</Modal.Body>
         </Modal>
-        <Row>
-          <Col>
-            <h1>Demo</h1>
+        <Row className="d-flex justify-content-center">
+          <Col md={8} lg={8}>
+            <h1>NEARANDREA</h1>
           </Col>
         </Row>
-        <Row>
-          <Col>
-
+        <Row className="d-flex justify-content-center">
+          <Col md={8} lg={8}>
+            {/* <Button hidden={!!acc ount} variant="secondary" onClick={handleSignIn}>Log in</Button>{' '} */}
             <Button variant="secondary" onClick={handleSignOut}>Log out</Button>{' '}
             <Button variant="secondary" onClick={handleSwitchWallet}>Switch Wallet</Button>{' '}
             {/* <Button variant="secondary" onClick={printAddressList}>Print</Button>{' '} */}
@@ -332,8 +328,8 @@ const Content: React.FC = () => {
             )}
           </Col>
         </Row>
-        <Row>
-          <Col>
+        <Row className="d-flex justify-content-center">
+          <Col md={8} lg={8}>
             <FormInput
               account={account}
               onSubmit={(e) => addAddress(e as unknown as SubmitEvent)}
@@ -346,8 +342,8 @@ const Content: React.FC = () => {
           </Col>
         </Row>
       </Container>
-    </Fragment>
+    </Fragment >
   );
-};
+}
 
 export default Content;

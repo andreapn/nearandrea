@@ -1,5 +1,5 @@
 import React from "react";
-// import "./styles.css";
+import "./styles.css";
 import '@near-wallet-selector/modal-ui/styles.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import type { AppProps } from "next/app";
@@ -15,11 +15,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href={favicon.src} />
-        <title>Demo</title>
-        <meta property="og:title" content="Demo" />
+        <title>NEARANDREA</title>
+        <meta property="og:title" content="NEARANDREA" />
         <meta
           property="og:description"
-          content="Nearandrea"
+          content="NEARANDREA"
         />
       </Head>
       <Component {...pageProps} />

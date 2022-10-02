@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 import type { Account } from "../interfaces";
+import { Col, Row } from "react-bootstrap";
 
 interface FormProps {
   account: Account;
@@ -28,15 +29,16 @@ const FormInput: React.FC<FormProps> = ({ account, onSubmit, send, clear, displa
   return (
     <Form onSubmit={onSubmit}>
       <fieldset id="fieldset" disabled={display}>
-        <Form.Label>Sign Nearandrea, {account.account_id}!, {parseNearStr(Big(account.amount)
+        <Form.Label>Hi, {account.account_id}!, {parseNearStr(Big(account.amount)
           .div(10 ** 24)
           .toString())}<span title="NEAR Tokens">Ⓝ</span></Form.Label>
+        <p>Multisend Ⓝ to multi address.</p>
         <Form.Group className="mb-3">
-          <Form.Label>Address:</Form.Label>
+          <Form.Label>Ⓝ Address:</Form.Label>
           <Form.Control type="input" id="message" required />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Amount <span title="NEAR Tokens">Ⓝ</span>:</Form.Label>
+          <Form.Label>Amount Ⓝ:</Form.Label>
           <Form.Control
             type="number"
             id="donation"
@@ -48,17 +50,19 @@ const FormInput: React.FC<FormProps> = ({ account, onSubmit, send, clear, displa
             min="0"
             step="0.01" />
         </Form.Group>
-
-        <Button variant="secondary" type="submit">
-          Add Address
-        </Button>{' '}
-        <Button variant="secondary" onClick={clear}>
-          Clear
-        </Button>{' '}
-        <Button variant="primary" onClick={send}>
-          Submit
-        </Button>
-
+        <Row>
+          <Col md={8} lg={8}>
+            <Button variant="secondary" type="submit">
+              Add Address
+            </Button>{' '}
+            <Button variant="secondary" onClick={clear}>
+              Clear
+            </Button>{' '}
+            <Button variant="primary" onClick={send}>
+              Submit
+            </Button>
+          </Col>
+        </Row>
       </fieldset>
     </Form>
   );
