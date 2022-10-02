@@ -1,34 +1,32 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { providers, utils } from "near-api-js";
 import type {
-  AccountView,
-  CodeResult,
+  AccountView, CodeResult,
 } from "near-api-js/lib/providers/provider";
 import { Transaction } from "@near-wallet-selector/core";
-import type { Account, Donate, Message } from "../interfaces";
+import type { Account, Address } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
-import { CONTRACT_ID } from "../constants";
 import SignIn from "./SignIn";
 import FormInput from "./FormInput";
-import Messages from "./Messages";
-import Greeting from "./Greeting";
-import Donates from "./Donates";
-import { retryWhen } from "rxjs";
 import { Container, Row, Col } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal'
+import AddressList from "./AddressList";
+import { CONTRACT_ID } from "../constants";
 
-const SUGGESTED_DONATION = "0";
+const DEFAULT_NEAR = "0";
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
 const Content: React.FC = () => {
   const { selector, modal, accounts, accountId } = useWalletSelector();
   const [account, setAccount] = useState<Account | null>(null);
-  // const [messages, setMessages] = useState<Array<Message>>([]);
-  const [greeting, setGreeting] = useState();
   const [loading, setLoading] = useState<boolean>(false);
-  const [donates, setDonates] = useState<Array<Donate>>([]);
+  const [addressList, setAddressList] = useState<Array<Address>>([]);
+  const [modalShow, setModalShow] = useState(false);
+  const [error, setError] = useState('');
+  const [display, setDisplay] = useState(false);
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
-    console.log("Call getAccount.");
     if (!accountId) {
       return null;
     }
@@ -48,130 +46,7 @@ const Content: React.FC = () => {
       }));
   }, [accountId, selector.options]);
 
-  const updateGreeting = useCallback(
-    async (message: string) => {
-      console.log("Call updateGreeting.");
-      const { contract } = selector.store.getState();
-      const wallet = await selector.wallet();
-      return wallet
-        .signAndSendTransaction({
-          signerId: accountId!,
-          receiverId: contract!.contractId,
-          actions: [
-            {
-              type: "FunctionCall",
-              params: {
-                methodName: "set_greeting",
-                args: { message: message },
-                gas: BOATLOAD_OF_GAS,
-                deposit: utils.format.parseNearAmount("0")!,
-              },
-            },
-          ],
-        })
-        .catch((err) => {
-          alert("Failed to add message");
-          console.log("Failed to add message");
-
-          throw err;
-        });
-    }, [selector]);
-
-  const donate = useCallback(
-    async (message: string, donation: string) => {
-      console.log("Call Donate.");
-      const { contract } = selector.store.getState();
-      const wallet = await selector.wallet();
-      return wallet
-        .signAndSendTransaction({
-          signerId: accountId!,
-          receiverId: contract!.contractId,
-          actions: [
-            {
-              type: "FunctionCall",
-              params: {
-                methodName: "multiSend",
-                args: {},
-                gas: BOATLOAD_OF_GAS,
-                deposit: utils.format.parseNearAmount(donation)!,
-              },
-            },
-          ],
-        })
-        .catch((err) => {
-          alert("Failed to add message");
-          console.log("Failed to add message");
-
-          throw err;
-        });
-    }, [selector]);
-
-  const getDonates = useCallback(() => {
-    console.log("Call getDonates.");
-    const { network } = selector.options;
-    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
-    const params: string = '{"from_index":0,"limit":50}';
-    const paramb64 = Buffer.from(params).toString('base64');
-
-
-    return provider
-      .query<CodeResult>({
-        request_type: "call_function",
-        account_id: CONTRACT_ID,
-        method_name: "get_donations",
-        args_base64: paramb64,
-        finality: "optimistic",
-      })
-      .then((res) => JSON.parse(Buffer.from(res.result).toString()));
-
-  }, [selector]);
-
-  const getMessages = useCallback(() => {
-    console.log("Call getMessages.");
-    const { network } = selector.options;
-    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
-
-    return provider
-      .query<CodeResult>({
-        request_type: "call_function",
-        account_id: CONTRACT_ID,
-        method_name: "getMessages",
-        args_base64: "",
-        finality: "optimistic",
-      })
-      .then((res) => JSON.parse(Buffer.from(res.result).toString()));
-  }, [selector]);
-
-  const getGreeting = useCallback(() => {
-    console.log("Call getGreeting.");
-    const { network } = selector.options;
-    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
-
-    return provider
-      .query<CodeResult>({
-        request_type: "call_function",
-        account_id: CONTRACT_ID,
-        method_name: "get_greeting",
-        args_base64: "",
-        finality: "optimistic",
-      })
-      .then((res) => JSON.parse(Buffer.from(res.result).toString()));
-  }, [selector]);
-
   useEffect(() => {
-    console.log("Call useEffect1.");
-    // TODO: don't just fetch once; subscribe!
-    // getMessages().then(setMessages);
-    getGreeting().then(setGreeting);
-  }, []);
-
-  useEffect(() => {
-    console.log("Call useEffect2.");
-    getDonates().then(setDonates);
-  }, []);
-
-  useEffect(() => {
-    console.log("Call useEffect3.");
     if (!accountId) {
       return setAccount(null);
     }
@@ -211,6 +86,25 @@ const Content: React.FC = () => {
 
     alert("Switched account to " + nextAccountId);
   };
+
+  const checkAccount = useCallback((nearAccount: string) => {
+    const { network } = selector.options;
+    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+
+    return provider
+      .query<CodeResult>({
+        request_type: "view_account",
+        account_id: nearAccount,
+        finality: "optimistic",
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+  }, [selector]);
 
   const addMessages = useCallback(
     async (message: string, donation: string, multiple: boolean) => {
@@ -273,86 +167,122 @@ const Content: React.FC = () => {
     [selector, accountId]
   );
 
-  const handleVerifyOwner = async () => {
+  // trigger wallet to send 
+  const submitSend = async () => {
+    // Calculate total deposit from addressList
+    let deposit: number = 0;
+    addressList.forEach((address) => {
+      if (address.nearAmount) {
+        deposit += Number(address.nearAmount);
+      }
+    });
+    console.log(deposit);
+    const jsonString = JSON.stringify(addressList)
+    console.log(jsonString);
+
+    // Sign wallet
     const wallet = await selector.wallet();
     try {
-      const owner = await wallet.verifyOwner({
-        message: "test message for verification",
+      return wallet.signAndSendTransaction({
+        signerId: accountId!,
+        actions: [
+          {
+            type: "FunctionCall",
+            params: {
+              methodName: "multiSend",
+              args: { listAddress: jsonString },
+              gas: BOATLOAD_OF_GAS,
+              deposit: utils.format.parseNearAmount(deposit.toString())!,
+            },
+          },
+        ],
       });
-
-      if (owner) {
-        alert(`Signature for verification: ${JSON.stringify(owner)}`);
-      }
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
-      alert(message);
+      throw err;
     }
   };
 
-  const handleSubmit = useCallback(
-    async (e: SubmitEvent) => {
-      e.preventDefault();
+  const handleSubmitSend = useCallback(async () => {
+    setDisplay(true);
+    try {
+      const result = await submitSend();
+      const accountView = await getAccount();
+      setAccount(accountView);
+      setDisplay(false);
+      setAddressList([]);
+      return result;
+    } catch (err: any) {
+      setDisplay(false);
+      setError(err.message)
+      setModalShow(true);
+    }
+  }, [submitSend]);
 
-      // TODO: Fix the typing so that target.elements exists..
+  const updateAddressList = (message: string, donation: number) => {
+    let check: boolean = false;
+    let currentDonation: number = 0;
+    addressList.forEach((address): any => {
+      if (address.nearAddress === message) {
+        currentDonation = Number(address.nearAmount);
+        check = true;
+        return true;
+      };
+    })
+
+    if (check) {
+      const newAddressList = addressList.filter((address) => { return address.nearAddress !== message })
+      const newDonation = Number(donation) + currentDonation;
+      newAddressList.push({ nearAddress: message, nearAmount: newDonation });
+      setAddressList(newAddressList);
+    } else {
+      setAddressList([
+        ...addressList,
+        { nearAddress: message, nearAmount: donation }
+      ])
+    }
+  };
+
+  const addAddress = useCallback(
+    (e: SubmitEvent) => {
+      e.preventDefault();
       // @ts-ignore.
       const { fieldset, message, donation, multiple } = e.target.elements;
-      fieldset.disabled = true;
-      return updateGreeting(message.value)
-        .then(async () => {
-          console.log(greeting)
-          try {
-            const newGreeting = await getGreeting();
-            setGreeting(newGreeting);
+      checkAccount(message.value)
+        .then((res) => {
+          if (donation.value !== "0") {
+            updateAddressList(message.value, donation.value);
             message.value = "";
-            fieldset.disabled = false;
+            donation.value = DEFAULT_NEAR;
             message.focus();
-          } catch (err) {
-            alert("Failed to refresh messages");
-            console.log("Failed to refresh messages");
-
-            throw err;
+          } else {
+            setError("Amount Ⓝ should not be 0.")
+            setModalShow(true);
+            message.value = "";
+            donation.value = DEFAULT_NEAR;
+            message.focus();
           }
-        })
-        .catch((err) => {
-          console.error(err);
-
-          fieldset.disabled = false;
+        }).catch((err) => {
+          setError(err.message)
+          setModalShow(true);
+          message.value = "";
+          donation.value = DEFAULT_NEAR;
+          message.focus();
         });
-    },
-    [updateGreeting, getGreeting]
+    }, [addressList, setAddressList]
   );
 
-  const handleDonate = useCallback(
-    async (e: SubmitEvent) => {
-      e.preventDefault();
+  const clear = () => {
+    setAddressList([]);
+  }
 
-      // TODO: Fix the typing so that target.elements exists..
-      // @ts-ignore.
-      const { fieldset, message, donation, multiple } = e.target.elements;
-      fieldset.disabled = true;
-      try {
-        const result = await donate(message.value, donation.value);
-        const accountView = await getAccount();
-        setAccount(accountView);
-        message.value = "";
-        fieldset.disabled = false;
-        return result;
-      } catch (err) {
-        alert("Failed to refresh messages");
-        console.log("Failed to refresh messages");
+  const remove = (e: any) => {
+    const value = e.currentTarget.value;
+    setAddressList(addressList.filter((address) => { return address.nearAddress !== value }))
+  }
 
-        throw err;
-      }
-      // return donate(message.value, donation.value)
-      //   .catch((err) => {
-      //     console.error(err);
-
-      //     fieldset.disabled = false;
-      //   });
-    },
-    [donate, getDonates, getAccount]
-  );
+  const printAddressList = () => {
+    console.log(addressList);
+  }
 
   if (loading) {
     return null;
@@ -373,6 +303,19 @@ const Content: React.FC = () => {
     <Fragment>
 
       <Container fluid="md">
+        <Modal
+          size="sm"
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          aria-labelledby="example-modal-sizes-title-sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="example-modal-sizes-title-sm">
+              Error
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{error}</Modal.Body>
+        </Modal>
         <Row>
           <Col>
             <h1>Demo</h1>
@@ -380,25 +323,26 @@ const Content: React.FC = () => {
         </Row>
         <Row>
           <Col>
-            <div>
-              <button onClick={handleSignOut}>Log out</button>
-              <button onClick={handleSwitchWallet}>Switch Wallet</button>
-              {/* <button onClick={handleVerifyOwner}>Verify Owner</button> */}
-              {accounts.length > 1 && (
-                <button onClick={handleSwitchAccount}>Switch Account</button>
-              )}
-            </div>
+
+            <Button variant="secondary" onClick={handleSignOut}>Log out</Button>{' '}
+            <Button variant="secondary" onClick={handleSwitchWallet}>Switch Wallet</Button>{' '}
+            {/* <Button variant="secondary" onClick={printAddressList}>Print</Button>{' '} */}
+            {accounts.length > 1 && (
+              <Button variant="secondary" onClick={handleSwitchAccount}>Switch Account</Button>
+            )}
           </Col>
         </Row>
         <Row>
           <Col>
             <FormInput
               account={account}
-              onSubmit={(e) => handleDonate(e as unknown as SubmitEvent)}
+              onSubmit={(e) => addAddress(e as unknown as SubmitEvent)}
+              send={() => handleSubmitSend()}
+              clear={() => clear()}
+              display={display}
             />
-            {/* <Messages messages={messages} /> */}
-            <Greeting greeting={greeting} />
-            <Donates donates={donates} />
+
+            <AddressList addressList={addressList} remove={(e) => remove(e)} />
           </Col>
         </Row>
       </Container>

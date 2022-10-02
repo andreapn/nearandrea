@@ -6,6 +6,11 @@ export interface Message {
   text: string;
 }
 
+export interface Address {
+  nearAddress: string;
+  nearAmount: number;
+}
+
 export type Account = AccountView & {
   account_id: string;
 };
