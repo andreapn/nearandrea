@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useContext, useEffect, useState } from "react";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import type { WalletSelector, AccountState } from "@near-wallet-selector/core";
@@ -12,6 +12,12 @@ import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupNightlyConnect } from "@near-wallet-selector/nightly-connect";
 import { CONTRACT_ID } from "../constants";
+import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
+import { providers } from "near-api-js";
+import type { AccountView } from "near-api-js/lib/providers/provider";
+import SignIn from "../components/SignIn";
+import Big from "big.js";
+import type { Account } from "../interfaces";
 
 declare global {
   interface Window {
@@ -40,6 +46,10 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [modal, setModal] = useState<WalletSelectorModal | null>(null);
   const [accounts, setAccounts] = useState<Array<AccountState>>([]);
+  const [account, setAccount] = useState<Account | null>();
+  const [modalShow, setModalShow] = useState(false);
+  const [error, setError] = useState('');
+  const [display, setDisplay] = useState(false);
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
@@ -67,6 +77,28 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
     const state = _selector.store.getState();
 
     setAccounts(state.accounts);
+    console.log("accounts: ", state.accounts);
+    if (state.accounts.length > 0) {
+      const accountState = state.accounts.find((account) => account.active);
+      if (accountState) {
+        const { network } = _selector.options;
+        const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+        provider
+          .query<AccountView>({
+            request_type: "view_account",
+            finality: "final",
+            account_id: accountState.accountId,
+          })
+          .then((data) => ({
+            ...data,
+            account_id: accountState.accountId,
+          }))
+          .then((acc) => {
+            setAccount(acc);
+          });
+      }
+    }
+    console.log("account: ", account);
 
     window.selector = _selector;
     window.modal = _modal;
@@ -101,12 +133,51 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
     return () => subscription.unsubscribe();
   }, [selector]);
 
+  const handleSignOut = async () => {
+    const wallet = await window.selector.wallet();
+
+    wallet.signOut().catch((err) => {
+      console.log("Failed to sign out");
+      console.error(err);
+    });
+  };
+
+  const handleSwitchWallet = () => {
+    window.modal.show();
+  };
+
+  const handleSwitchAccount = () => {
+    const currentIndex = accounts.findIndex((x) => x.accountId === account?.account_id);
+    const nextIndex = currentIndex < accounts.length - 1 ? currentIndex + 1 : 0;
+
+    const nextAccountId = accounts[nextIndex].accountId;
+
+    window.selector.setActiveAccount(nextAccountId);
+
+    alert("Switched account to " + nextAccountId);
+  };
+
+  const handleSignIn = () => {
+    if (modal) {
+      modal.show();
+    }
+  };
+
   if (!selector || !modal) {
     return null;
   }
 
   const accountId =
     accounts.find((account) => account.active)?.accountId || null;
+
+
+  if (!accountId) {
+    return (
+      <Fragment>
+        <SignIn handleSignIn={() => { handleSignIn() }} />
+      </Fragment>
+    );
+  }
 
   return (
     <WalletSelectorContext.Provider
@@ -117,8 +188,38 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
         accountId,
       }}
     >
-      {children}
-    </WalletSelectorContext.Provider>
+      <Container fluid="lg">
+        <Modal
+          size="sm"
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          aria-labelledby="example-modal-sizes-title-sm"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="example-modal-sizes-title-sm">
+              Error
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{error}</Modal.Body>
+        </Modal>
+        <Row className="d-flex justify-content-center">
+          <Col md={8} lg={8}>
+            <h1>NEARANDREA</h1>
+          </Col>
+        </Row>
+        <Row className="d-flex justify-content-center">
+          <Col md={8} lg={8}>
+            <Button variant="secondary" onClick={handleSignOut}>Log out</Button>{' '}
+            <Button variant="secondary" onClick={handleSwitchWallet}>Switch Wallet</Button>{' '}
+            {/* <Button variant="secondary" onClick={printAddressList}>Print</Button>{' '} */}
+            {accounts.length > 1 && (
+              <Button variant="secondary" onClick={handleSwitchAccount}>Switch Account</Button>
+            )}
+          </Col>
+        </Row>
+        {children}
+      </Container>
+    </WalletSelectorContext.Provider >
   );
 };
 

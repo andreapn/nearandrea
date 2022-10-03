@@ -6,9 +6,7 @@ import Content from "../components/Content";
 const Home: NextPage = () => {
   return (
     <Fragment>
-      <WalletSelectorContextProvider>
-        <Content />
-      </WalletSelectorContextProvider>
+      <Content />
     </Fragment>
   );
 };

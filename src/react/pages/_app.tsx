@@ -5,6 +5,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import favicon from "../public/favicon.ico";
+import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
+import Link from 'next/link';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -22,7 +24,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="NEARANDREA"
         />
       </Head>
-      <Component {...pageProps} />
+      <Link href="/"><a>Home</a></Link>{' '}
+      <Link href="/about"><a>About</a></Link>
+      <WalletSelectorContextProvider>
+        <Component {...pageProps} />
+      </WalletSelectorContextProvider>
     </div>
   );
 }

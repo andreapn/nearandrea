@@ -20,10 +20,7 @@ const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 const Content: React.FC = () => {
   const { selector, modal, accounts, accountId } = useWalletSelector();
   const [account, setAccount] = useState<Account | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [addressList, setAddressList] = useState<Array<Address>>([]);
-  const [modalShow, setModalShow] = useState(false);
-  const [error, setError] = useState('');
   const [display, setDisplay] = useState(false);
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
@@ -51,41 +48,14 @@ const Content: React.FC = () => {
       return setAccount(null);
     }
 
-    setLoading(true);
+    // setLoading(true);
 
     getAccount().then((nextAccount) => {
       setAccount(nextAccount);
-      setLoading(false);
+      // setLoading(false);
     });
   }, [accountId, getAccount]);
 
-  const handleSignIn = () => {
-    modal.show();
-  };
-
-  const handleSignOut = async () => {
-    const wallet = await selector.wallet();
-
-    wallet.signOut().catch((err) => {
-      console.log("Failed to sign out");
-      console.error(err);
-    });
-  };
-
-  const handleSwitchWallet = () => {
-    modal.show();
-  };
-
-  const handleSwitchAccount = () => {
-    const currentIndex = accounts.findIndex((x) => x.accountId === accountId);
-    const nextIndex = currentIndex < accounts.length - 1 ? currentIndex + 1 : 0;
-
-    const nextAccountId = accounts[nextIndex].accountId;
-
-    selector.setActiveAccount(nextAccountId);
-
-    alert("Switched account to " + nextAccountId);
-  };
 
   const checkAccount = useCallback((nearAccount: string) => {
     const { network } = selector.options;
@@ -213,8 +183,8 @@ const Content: React.FC = () => {
       return result;
     } catch (err: any) {
       setDisplay(false);
-      setError(err.message)
-      setModalShow(true);
+      // setError(err.message)
+      // setModalShow(true);
     }
   }, [submitSend]);
 
@@ -255,15 +225,15 @@ const Content: React.FC = () => {
             donation.value = DEFAULT_NEAR;
             message.focus();
           } else {
-            setError("Amount Ⓝ should not be 0.")
-            setModalShow(true);
+            // setError("Amount Ⓝ should not be 0.")
+            // setModalShow(true);
             message.value = "";
             donation.value = DEFAULT_NEAR;
             message.focus();
           }
         }).catch((err) => {
-          setError(err.message)
-          setModalShow(true);
+          // setError(err.message)
+          // setModalShow(true);
           message.value = "";
           donation.value = DEFAULT_NEAR;
           message.focus();
@@ -284,50 +254,20 @@ const Content: React.FC = () => {
     console.log(addressList);
   }
 
-  if (loading) {
-    return null;
-  }
+  // if (loading) {
+  //   return null;
+  // }
 
-  if (!account) {
+  // if (!account) {
+  //   return (
+  //     <Fragment>
+  //       <SignIn handleSignIn={() => { handleSignIn() }} />
+  //     </Fragment>
+  //   );
+  // }
+  if (account) {
     return (
       <Fragment>
-        <SignIn handleSignIn={() => { handleSignIn() }} />
-      </Fragment>
-    );
-  }
-
-  return (
-    <Fragment>
-      <Container fluid="lg">
-        <Modal
-          size="sm"
-          show={modalShow}
-          onHide={() => setModalShow(false)}
-          aria-labelledby="example-modal-sizes-title-sm"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title id="example-modal-sizes-title-sm">
-              Error
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{error}</Modal.Body>
-        </Modal>
-        <Row className="d-flex justify-content-center">
-          <Col md={8} lg={8}>
-            <h1>NEARANDREA</h1>
-          </Col>
-        </Row>
-        <Row className="d-flex justify-content-center">
-          <Col md={8} lg={8}>
-            {/* <Button hidden={!!acc ount} variant="secondary" onClick={handleSignIn}>Log in</Button>{' '} */}
-            <Button variant="secondary" onClick={handleSignOut}>Log out</Button>{' '}
-            <Button variant="secondary" onClick={handleSwitchWallet}>Switch Wallet</Button>{' '}
-            {/* <Button variant="secondary" onClick={printAddressList}>Print</Button>{' '} */}
-            {accounts.length > 1 && (
-              <Button variant="secondary" onClick={handleSwitchAccount}>Switch Account</Button>
-            )}
-          </Col>
-        </Row>
         <Row className="d-flex justify-content-center">
           <Col md={8} lg={8}>
             <FormInput
@@ -337,13 +277,12 @@ const Content: React.FC = () => {
               clear={() => clear()}
               display={display}
             />
-
             <AddressList addressList={addressList} remove={(e) => remove(e)} />
           </Col>
         </Row>
-      </Container>
-    </Fragment >
-  );
-}
+      </Fragment >
+    );
+  } else { return null; }
+};
 
 export default Content;
