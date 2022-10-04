@@ -1,14 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./styles.css";
-import '@near-wallet-selector/modal-ui/styles.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import favicon from "../public/favicon.ico";
 import { WalletSelectorContextProvider } from "../contexts/WalletSelectorContext";
 import Link from 'next/link';
+import IndexNavbar from "../components/Navbars/IndexNavbar.js";
+import "../assets/css/nucleo-icons.css";
+import "../assets/css/blk-design-system-react.css";
+import "../assets/demo/demo.css";
+import '@near-wallet-selector/modal-ui/styles.css'
+import PageHeader from "../components/PageHeader/PageHeader";
+import Footer from "../components/Footer/Footer";
+import Basics from "../views/IndexSections/Basics";
+import Navbars from "../views/IndexSections/Navbars";
+import Tabs from "../views/IndexSections/Tabs";
+import Pagination from "../views/IndexSections/Pagination";
+import Notifications from "../views/IndexSections/Notifications";
+import Typography from "../views/IndexSections/Typography";
+import JavaScript from "../views/IndexSections/JavaScript";
+import NucleoIcons from "../views/IndexSections/NucleoIcons";
+import Signup from "../views/IndexSections/Signup";
+import Examples from "../views/IndexSections/Examples";
+import Download from "../views/IndexSections/Download";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    document.body.classList.toggle("index-page");
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      document.body.classList.toggle("index-page");
+    };
+
+  }, []);
   return (
     <div>
       <Head>
@@ -24,11 +49,27 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="NEARANDREA"
         />
       </Head>
-      <Link href="/"><a>Home</a></Link>{' '}
-      <Link href="/about"><a>About</a></Link>
-      <WalletSelectorContextProvider>
-        <Component {...pageProps} />
-      </WalletSelectorContextProvider>
+      <IndexNavbar />
+      <div className="wrapper">
+        <PageHeader />
+        <div className="main">
+          <WalletSelectorContextProvider>
+            <Component {...pageProps} />
+          </WalletSelectorContextProvider>
+          <Basics />
+          <Navbars />
+          <Tabs />
+          <Pagination />
+          <Notifications />
+          <Typography />
+          {/* <JavaScript /> */}
+          <NucleoIcons />
+          <Signup />
+          <Examples />
+          <Download />
+        </div>
+        <Footer />
+      </div>
     </div>
   );
 }

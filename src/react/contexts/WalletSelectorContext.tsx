@@ -12,11 +12,23 @@ import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupNightlyConnect } from "@near-wallet-selector/nightly-connect";
 import { CONTRACT_ID } from "../constants";
-import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
+// import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
+import {
+  Button,
+  Label,
+  FormGroup,
+  CustomInput,
+  Input,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
+  Container,
+  Row,
+  Col
+} from "reactstrap";
 import { providers } from "near-api-js";
 import type { AccountView } from "near-api-js/lib/providers/provider";
 import SignIn from "../components/SignIn";
-import Big from "big.js";
 import type { Account } from "../interfaces";
 
 declare global {
@@ -77,7 +89,6 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
     const state = _selector.store.getState();
 
     setAccounts(state.accounts);
-    console.log("accounts: ", state.accounts);
     if (state.accounts.length > 0) {
       const accountState = state.accounts.find((account) => account.active);
       if (accountState) {
@@ -98,7 +109,6 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
           });
       }
     }
-    console.log("account: ", account);
 
     window.selector = _selector;
     window.modal = _modal;
@@ -125,8 +135,6 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
         distinctUntilChanged()
       )
       .subscribe((nextAccounts) => {
-        console.log("Accounts Update", nextAccounts);
-
         setAccounts(nextAccounts);
       });
 
@@ -189,34 +197,6 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
       }}
     >
       <Container fluid="lg">
-        <Modal
-          size="sm"
-          show={modalShow}
-          onHide={() => setModalShow(false)}
-          aria-labelledby="example-modal-sizes-title-sm"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title id="example-modal-sizes-title-sm">
-              Error
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{error}</Modal.Body>
-        </Modal>
-        <Row className="d-flex justify-content-center">
-          <Col md={8} lg={8}>
-            <h1>NEARANDREA</h1>
-          </Col>
-        </Row>
-        <Row className="d-flex justify-content-center">
-          <Col md={8} lg={8}>
-            <Button variant="secondary" onClick={handleSignOut}>Log out</Button>{' '}
-            <Button variant="secondary" onClick={handleSwitchWallet}>Switch Wallet</Button>{' '}
-            {/* <Button variant="secondary" onClick={printAddressList}>Print</Button>{' '} */}
-            {accounts.length > 1 && (
-              <Button variant="secondary" onClick={handleSwitchAccount}>Switch Account</Button>
-            )}
-          </Col>
-        </Row>
         {children}
       </Container>
     </WalletSelectorContext.Provider >

@@ -8,9 +8,19 @@ import type { Account, Address } from "../interfaces";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
 import SignIn from "./SignIn";
 import FormInput from "./FormInput";
-import { Container, Row, Col } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal'
+import {
+  Button,
+  Label,
+  FormGroup,
+  CustomInput,
+  Input,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
+  Container,
+  Row,
+  Col
+} from "reactstrap";
 import AddressList from "./AddressList";
 import { CONTRACT_ID } from "../constants";
 

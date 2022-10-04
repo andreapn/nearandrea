@@ -6,7 +6,7 @@ import Content from "../components/Content";
 const Home: NextPage = () => {
   return (
     <Fragment>
-      <Content />
+      {/* <Content /> */}
     </Fragment>
   );
 };

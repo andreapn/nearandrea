@@ -1,10 +1,21 @@
 import React, { MouseEventHandler, FormEventHandler } from "react";
 import Big from "big.js";
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import {
+  Button,
+  Form,
+  Label,
+  FormGroup,
+  CustomInput,
+  Input,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
+  Container,
+  Row,
+  Col
+} from "reactstrap";
 
 import type { Account } from "../interfaces";
-import { Col, Row } from "react-bootstrap";
 
 interface FormProps {
   account: Account;
@@ -29,17 +40,17 @@ const FormInput: React.FC<FormProps> = ({ account, onSubmit, send, clear, displa
   return (
     <Form onSubmit={onSubmit}>
       <fieldset id="fieldset" disabled={display}>
-        <Form.Label>Hi, {account.account_id}!, {parseNearStr(Big(account.amount)
+        <Label>Hi, {account.account_id}!, {parseNearStr(Big(account.amount)
           .div(10 ** 24)
-          .toString())}<span title="NEAR Tokens">Ⓝ</span></Form.Label>
+          .toString())}<span title="NEAR Tokens">Ⓝ</span></Label>
         <p>Multisend Ⓝ to multi address.</p>
-        <Form.Group className="mb-3">
-          <Form.Label>Ⓝ Address:</Form.Label>
-          <Form.Control type="input" id="message" required />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Amount Ⓝ:</Form.Label>
-          <Form.Control
+        <FormGroup className="mb-3">
+          <Label>Ⓝ Address:</Label>
+          <Input id="message" required />
+        </FormGroup>
+        <FormGroup className="mb-3">
+          <Label>Amount Ⓝ:</Label>
+          <Input
             type="number"
             id="donation"
             autoComplete="off"
@@ -49,7 +60,7 @@ const FormInput: React.FC<FormProps> = ({ account, onSubmit, send, clear, displa
               .toString()}
             min="0"
             step="0.01" />
-        </Form.Group>
+        </FormGroup>
         <Row>
           <Col md={8} lg={8}>
             <Button variant="secondary" type="submit">

@@ -1,6 +1,19 @@
 import React, { MouseEventHandler } from 'react'
 import { Address } from '../interfaces';
-import { CloseButton, Row, Col, Table } from 'react-bootstrap';
+import {
+    Button,
+    Label,
+    FormGroup,
+    CustomInput,
+    Input,
+    InputGroupAddon,
+    InputGroupText,
+    InputGroup,
+    Container,
+    Row,
+    Col,
+    Table
+} from "reactstrap";
 
 interface AddressListProps {
     addressList: Array<Address>;
@@ -25,7 +38,7 @@ const AddressList: React.FC<AddressListProps> = ({ addressList, remove }) => {
                             <td>{i + 1}</td>
                             <td>{address.nearAddress}</td>
                             <td>{address.nearAmount}</td>
-                            <td><CloseButton value={address.nearAddress} onClick={remove} /></td>
+                            <td><Button value={address.nearAddress} onClick={remove}>X</Button></td>
                         </tr>
                     )}
                 </tbody>

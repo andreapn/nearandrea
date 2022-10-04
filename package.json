@@ -26,7 +26,8 @@
     "lint": "nx workspace-lint && nx run-many --target=lint --all --parallel",
     "lint:fix": "nx run-many --target=lint --all --fix",
     "serve:react": "nx serve react",
-    "test": "nx run-many --target=test --all"
+    "test": "nx run-many --target=test --all",
+    "compile-sass": "sass src/react/assets/scss/blk-design-system-react.scss src/react/assets/css/blk-design-system-react.css"
   },
   "dependencies": {
     "@jscutlery/semver": "^2.25.2",
@@ -59,12 +60,16 @@
     "next": "12.2.3",
     "ngx-deploy-npm": "^4.1.1",
     "react": "18.2.0",
-    "react-bootstrap": "^2.5.0",
+    "reactstrap": "8.7.1",
     "react-dom": "18.2.0",
     "regenerator-runtime": "0.13.7",
     "rxjs": "^7.5.5",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "sass": "latest",
+    "nouislider": "14.6.3",
+    "react-datetime": "3.1.1",
+    "moment": "2.29.4"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",

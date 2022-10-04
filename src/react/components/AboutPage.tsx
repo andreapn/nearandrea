@@ -1,4 +1,16 @@
-import { Col, Row } from "react-bootstrap";
+import {
+    Button,
+    Label,
+    FormGroup,
+    CustomInput,
+    Input,
+    InputGroupAddon,
+    InputGroupText,
+    InputGroup,
+    Container,
+    Row,
+    Col
+} from "reactstrap";
 import { useWalletSelector } from "../contexts/WalletSelectorContext";
 
 const AboutPage = () => {
@@ -6,7 +18,7 @@ const AboutPage = () => {
         <>
             <Row className="d-flex justify-content-center">
                 <Col md={8} lg={8}>
-                    About Page
+                    About Page abc
                 </Col>
             </Row>
 
