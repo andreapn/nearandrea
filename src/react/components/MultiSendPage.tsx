@@ -28,6 +28,7 @@ import { Account, Address } from "../interfaces";
 import { providers, utils } from "near-api-js";
 
 const DEFAULT_NEAR = "0";
+const FEE = 0.05;
 const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
 
 const MultiSendPage: React.FC = () => {
@@ -40,6 +41,7 @@ const MultiSendPage: React.FC = () => {
   const [modalSuccessShow, setModalSuccessShow] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [sentNumber, setSentNumber] = useState(0);
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
     if (!accountId) {
@@ -105,6 +107,7 @@ const MultiSendPage: React.FC = () => {
     console.log(deposit);
     const jsonString = JSON.stringify(addressList)
     console.log(jsonString);
+    setSentNumber(deposit);
 
     // Sign wallet
     const wallet = await selector.wallet();
@@ -118,7 +121,7 @@ const MultiSendPage: React.FC = () => {
               methodName: "multiSend",
               args: { listAddress: jsonString },
               gas: BOATLOAD_OF_GAS,
-              deposit: utils.format.parseNearAmount(deposit.toString())!,
+              deposit: utils.format.parseNearAmount((deposit + FEE).toString())!,
             },
           },
         ],
@@ -137,6 +140,7 @@ const MultiSendPage: React.FC = () => {
       setDisplay(false);
       setAddressList([]);
       onShowSuccess(true, "Sent successful!");
+      setSentNumber(0);
       return result;
     } catch (err: any) {
       setDisplay(false);
@@ -174,7 +178,7 @@ const MultiSendPage: React.FC = () => {
     window.setTimeout(() => {
       setModalShow(!flag);
       setError("");
-    }, 2000)
+    }, 2500)
   }
 
   const onShowSuccess = (flag: boolean, msg: string) => {
@@ -183,7 +187,7 @@ const MultiSendPage: React.FC = () => {
     window.setTimeout(() => {
       setModalSuccessShow(!flag);
       setSuccess("");
-    }, 2000)
+    }, 2500)
   }
 
   const addAddress = useCallback(
@@ -191,51 +195,61 @@ const MultiSendPage: React.FC = () => {
       e.preventDefault();
       // @ts-ignore.
       const { fieldset, message, donation, multiple } = e.target.elements;
-      checkAccount(message.value)
-        .then((res) => {
-          if (donation.value !== "0") {
-            updateAddressList(message.value, donation.value);
-            message.value = "";
-            donation.value = DEFAULT_NEAR;
-            message.focus();
-            onShowSuccess(true, "Address added successful!");
-          } else {
-            setError("Amount Ⓝ should not be 0.")
+      if (message.value !== "") {
+        checkAccount(message.value)
+          .then((res) => {
+            if (donation.value !== "0") {
+              updateAddressList(message.value, donation.value);
+              message.value = "";
+              donation.value = DEFAULT_NEAR;
+              message.focus();
+              onShowSuccess(true, "Address added successful!");
+            } else {
+              setError("Amount Ⓝ should not be 0.")
+              message.value = "";
+              donation.value = DEFAULT_NEAR;
+              message.focus();
+              onShowAlert(true);
+            }
+          }).catch((err) => {
+            console.log(err.message)
+            setError(err.message)
             onShowAlert(true);
             message.value = "";
             donation.value = DEFAULT_NEAR;
             message.focus();
-          }
-        }).catch((err) => {
-          console.log(err.message)
-          setError(err.message)
-          onShowAlert(true);
-          message.value = "";
-          donation.value = DEFAULT_NEAR;
-          message.focus();
-        });
-    }, [addressList, setAddressList]
+          });
+      }
+    }, [addressList]
   );
 
   const clear = () => {
     setAddressList([]);
+    setSentNumber(0);
   }
 
   const remove = (e: any) => {
     const value = e.currentTarget.value;
     setAddressList(addressList.filter((address) => { return address.nearAddress !== value }))
+    setSentNumber(0);
   }
 
-  if (!account) {
-    return null;
-  }
+  // const scrollToDownload = () => {
+  //   document
+  //     .getElementById("download-section")
+  //     .scrollIntoView({ behavior: "smooth" });
+  // };
+
+  // if (!account) {
+  //   return null;
+  // }
 
   return (
     <div className="section section-signup">
       <Container>
         <div className="squares square-1" />
         <div className="squares square-2" />
-        {/* <div className="squares square-3" /> */}
+        <div className="squares square-3" />
         <div className="squares square-4" />
         <Form onSubmit={(e) => addAddress(e as unknown as SubmitEvent)}>
           <fieldset disabled={display}>
@@ -244,10 +258,16 @@ const MultiSendPage: React.FC = () => {
               <Col sm="8" className="text-center">
                 <img
                   alt="..."
-                  className="img-fluid rounded shadow"
+                  className="img-fluid rounded"
                   src={image.src}
                   style={{ width: "300px" }}
                 />
+                <h1>NEAR MultiSend</h1>
+              </Col>
+            </Row>
+            <Row className="justify-content-md-center">
+              <Col sm="8">
+                <h4 className="text-primary" hidden={!accountId}>Current balance is <b className="text-success">{account ? utils.format.formatNearAmount(account.amount, 2) : 0}Ⓝ</b><span hidden={sentNumber === 0}>. You intend to send <b className="text-success"><span>{sentNumber}Ⓝ</span></b>, your fee is <b className="text-success">{FEE}Ⓝ</b>/tx.</span></h4>
               </Col>
             </Row>
             <Row className="justify-content-md-center">
@@ -263,6 +283,7 @@ const MultiSendPage: React.FC = () => {
                     placeholder="Input NEAR address here."
                     type="text"
                     id="message"
+                    require="true"
                   />
                 </FormGroup>
               </Col>
@@ -281,9 +302,9 @@ const MultiSendPage: React.FC = () => {
                     id="donation"
                     autoComplete="off"
                     defaultValue={"0"}
-                    max={Big(account.amount)
-                      .div(10 ** 24)
-                      .toString()}
+                    // max={account ? Big(account.amount)
+                    //   .div(10 ** 24)
+                    //   .toString() : "0"}
                     min="0"
                     step="0.01" />
                 </FormGroup>
@@ -293,6 +314,9 @@ const MultiSendPage: React.FC = () => {
               <Col sm="8">
                 <Button color="default" type="submit">
                   <i className="tim-icons icon-simple-add" /> Add
+                </Button>
+                <Button color="default" disabled>
+                  <i className="tim-icons icon-single-copy-04" /> Import
                 </Button>
                 <Button color="default" type="button" onClick={() => clear()}>
                   <i className="tim-icons icon-simple-remove" /> Clear

@@ -242,11 +242,8 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
         <Container>
           <div className="navbar-translate">
             <NavbarBrand to="/" id="navbar-brand">
-              <span>NEARANDREA</span>
+              <span>NEARANDREA</span><h5>Bring convenience to NEAR users</h5>
             </NavbarBrand>
-            <UncontrolledTooltip placement="bottom" target="navbar-brand">
-              Bring convenience to NEAR users.
-            </UncontrolledTooltip>
             <button
               aria-expanded={collapseOpen}
               className="navbar-toggler navbar-toggler"
@@ -287,7 +284,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
               <NavItem className="p-0">
                 <NavLink
                   data-placement="bottom"
-                  href="#"
+                  href="https://twitter.com/AndreaPN7"
                   rel="noopener noreferrer"
                   target="_blank"
                   title="Follow us on Twitter"
@@ -296,64 +293,6 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                   <p className="d-lg-none d-xl-none">Twitter</p>
                 </NavLink>
               </NavItem>
-              <NavItem className="p-0">
-                <NavLink
-                  data-placement="bottom"
-                  href="#"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  title="Like us on Facebook"
-                >
-                  <i className="fab fa-facebook-square" />
-                  <p className="d-lg-none d-xl-none">Facebook</p>
-                </NavLink>
-              </NavItem>
-              <NavItem className="p-0">
-                <NavLink
-                  data-placement="bottom"
-                  href="#"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  title="Follow us on Instagram"
-                >
-                  <i className="fab fa-instagram" />
-                  <p className="d-lg-none d-xl-none">Instagram</p>
-                </NavLink>
-              </NavItem>
-
-              <UncontrolledDropdown nav hidden={!accountId}>
-                <DropdownToggle
-                  caret
-                  color="default"
-                  data-toggle="dropdown"
-                  href="#"
-                  nav
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <i className="fa fa-cogs d-lg-none d-xl-none" />
-                  Category
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-with-icons">
-                  <Link href="/">
-                    <DropdownItem href="#">
-                      <i className="tim-icons icon-paper" />
-                      Home
-                    </DropdownItem>
-                  </Link>
-                  <Link href="/multisend">
-                    <DropdownItem href="#">
-                      <i className="tim-icons icon-paper" />
-                      MultiSend
-                    </DropdownItem>
-                  </Link>
-                  {/* <Link href="/about">
-                    <DropdownItem href="#">
-                      <i className="tim-icons icon-paper" />
-                      About
-                    </DropdownItem>
-                  </Link> */}
-                </DropdownMenu>
-              </UncontrolledDropdown>
               <NavItem className="p-2">
                 <p>{accountId}
                   {/* <span hidden={!accountId}>{utils.format.formatNearAmount(account ? account.amount : "0", 2)} Ⓝ</span> */}
