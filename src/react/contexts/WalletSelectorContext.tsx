@@ -65,9 +65,6 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
   const [modal, setModal] = useState<WalletSelectorModal | null>(null);
   const [accounts, setAccounts] = useState<Array<AccountState>>([]);
   const [account, setAccount] = useState<Account | null>();
-  const [modalShow, setModalShow] = useState(false);
-  const [error, setError] = useState('');
-  const [display, setDisplay] = useState(false);
 
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [collapseOut, setCollapseOut] = useState("");
@@ -270,7 +267,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
             <div className="navbar-collapse-header">
               <Row>
                 <Col className="collapse-brand" xs="6">
-                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                  <a href="#" onClick={(e) => e.preventDefault()}>
                     NEARANDREA
                   </a>
                 </Col>
@@ -324,12 +321,12 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                 </NavLink>
               </NavItem>
 
-              <UncontrolledDropdown nav>
+              <UncontrolledDropdown nav hidden={!accountId}>
                 <DropdownToggle
                   caret
                   color="default"
                   data-toggle="dropdown"
-                  href="#pablo"
+                  href="#"
                   nav
                   onClick={(e) => e.preventDefault()}
                 >
@@ -338,23 +335,23 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-with-icons">
                   <Link href="/">
-                    <DropdownItem>
+                    <DropdownItem href="#">
                       <i className="tim-icons icon-paper" />
                       Home
                     </DropdownItem>
                   </Link>
                   <Link href="/multisend">
-                    <DropdownItem>
+                    <DropdownItem href="#">
                       <i className="tim-icons icon-paper" />
-                      Multi-send
+                      MultiSend
                     </DropdownItem>
                   </Link>
-                  <Link href="/about">
-                    <DropdownItem>
+                  {/* <Link href="/about">
+                    <DropdownItem href="#">
                       <i className="tim-icons icon-paper" />
                       About
                     </DropdownItem>
-                  </Link>
+                  </Link> */}
                 </DropdownMenu>
               </UncontrolledDropdown>
               <NavItem className="p-2">
@@ -365,31 +362,31 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
 
               <NavItem hidden={!!accountId}>
                 <Button
-                  className="nav-link d-none d-lg-block"
+                  className="nav-link"
                   color="default"
                   onClick={handleSignIn}
                 >
-                  <i className="tim-icons icon-key-25" /> Login
+                  <i className="tim-icons icon-key-25" /> <span className="d-none d-sm-block">Login</span>
                 </Button>
               </NavItem>
 
               <NavItem hidden={!accountId}>
                 <Button
-                  className="nav-link d-none d-lg-block"
+                  className="nav-link"
                   color="default"
                   onClick={handleSwitchWallet}
                 >
-                  <i className="tim-icons icon-wallet-43" /> Switch Wallet
+                  <i className="tim-icons icon-wallet-43" /> <span className="d-none d-sm-block">Switch Wallet</span>
                 </Button>
               </NavItem>
 
               <NavItem hidden={!accountId}>
                 <Button
-                  className="nav-link d-none d-lg-block"
+                  className="nav-link"
                   color="default"
                   onClick={handleSignOut}
                 >
-                  <i className="tim-icons icon-button-power" /> Log Out
+                  <i className="tim-icons icon-button-power" /> <span className="d-none d-sm-block">Log Out</span>
                 </Button>
               </NavItem>
             </Nav>

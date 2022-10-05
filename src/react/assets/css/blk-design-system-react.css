@@ -16868,6 +16868,14 @@ img {
   color: #ffffff;
 }
 
+.navbar-nav li i.icon-wallet-43,
+i.icon-button-power,
+i.icon-key-25 {
+  vertical-align: middle;
+  font-size: 18px;
+  padding-right: 5px;
+}
+
 .navbar-nav li i {
   vertical-align: middle;
   font-size: 18px;
@@ -16929,6 +16937,17 @@ img {
   .navbar .navbar-nav .btn {
     margin-left: -3px;
     display: flex;
+  }
+
+  .navbar .navbar-nav .btn i.icon-wallet-43,
+  i.icon-button-power,
+  i.icon-key-25 {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
+  .navbar .navbar-nav .btn {
+    margin-bottom: 5px;
   }
 
   .navbar .navbar-nav .btn i {

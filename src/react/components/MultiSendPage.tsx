@@ -21,7 +21,8 @@ import {
   InputGroup,
   Container,
   Row,
-  Col
+  Col,
+  UncontrolledAlert
 } from "reactstrap";
 import { Account, Address } from "../interfaces";
 import { providers, utils } from "near-api-js";
@@ -35,6 +36,10 @@ const MultiSendPage: React.FC = () => {
   const [account, setAccount] = useState<Account | null>(null);
   const [addressList, setAddressList] = useState<Array<Address>>([]);
   const [display, setDisplay] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const [modalSuccessShow, setModalSuccessShow] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
     if (!accountId) {
@@ -131,11 +136,12 @@ const MultiSendPage: React.FC = () => {
       setAccount(accountView);
       setDisplay(false);
       setAddressList([]);
+      onShowSuccess(true, "Sent successful!");
       return result;
     } catch (err: any) {
       setDisplay(false);
-      // setError(err.message)
-      // setModalShow(true);
+      setError(err.message)
+      onShowAlert(true);
     }
   }, [submitSend]);
 
@@ -163,6 +169,23 @@ const MultiSendPage: React.FC = () => {
     }
   };
 
+  const onShowAlert = (flag: boolean) => {
+    setModalShow(flag);
+    window.setTimeout(() => {
+      setModalShow(!flag);
+      setError("");
+    }, 2000)
+  }
+
+  const onShowSuccess = (flag: boolean, msg: string) => {
+    setModalSuccessShow(flag);
+    setSuccess(msg);
+    window.setTimeout(() => {
+      setModalSuccessShow(!flag);
+      setSuccess("");
+    }, 2000)
+  }
+
   const addAddress = useCallback(
     (e: SubmitEvent) => {
       e.preventDefault();
@@ -175,16 +198,18 @@ const MultiSendPage: React.FC = () => {
             message.value = "";
             donation.value = DEFAULT_NEAR;
             message.focus();
+            onShowSuccess(true, "Address added successful!");
           } else {
-            // setError("Amount Ⓝ should not be 0.")
-            // setModalShow(true);
+            setError("Amount Ⓝ should not be 0.")
+            onShowAlert(true);
             message.value = "";
             donation.value = DEFAULT_NEAR;
             message.focus();
           }
         }).catch((err) => {
-          // setError(err.message)
-          // setModalShow(true);
+          console.log(err.message)
+          setError(err.message)
+          onShowAlert(true);
           message.value = "";
           donation.value = DEFAULT_NEAR;
           message.focus();
@@ -267,7 +292,7 @@ const MultiSendPage: React.FC = () => {
             <Row className="justify-content-center">
               <Col sm="8">
                 <Button color="default" type="submit">
-                  <i className="tim-icons icon-components" /> Add
+                  <i className="tim-icons icon-simple-add" /> Add
                 </Button>
                 <Button color="default" type="button" onClick={() => clear()}>
                   <i className="tim-icons icon-simple-remove" /> Clear
@@ -276,7 +301,27 @@ const MultiSendPage: React.FC = () => {
                   <i className="tim-icons icon-send" /> Send
                 </Button>
               </Col>
-            </Row></fieldset>
+            </Row>
+            <Row className="justify-content-center">
+              <Col sm="8">
+                <UncontrolledAlert hidden={!modalShow} className="alert-with-icon" color="danger">
+                  <span data-notify="icon" className="tim-icons icon-bell-55" />
+                  <span>
+                    {error}
+                  </span>
+                </UncontrolledAlert>
+              </Col>
+              <Col sm="8">
+                <UncontrolledAlert hidden={!modalSuccessShow} className="alert-with-icon" color="success">
+                  <span data-notify="icon" className="tim-icons icon-satisfied" />
+                  <span>
+                    {success}
+                  </span>
+                </UncontrolledAlert>
+              </Col>
+            </Row>
+
+          </fieldset>
           <Row className="justify-content-md-center">
             <Col sm="8">
               <Table className="table" hidden={addressList.length === 0}>
@@ -294,7 +339,7 @@ const MultiSendPage: React.FC = () => {
                       <td className="text-center">{i + 1}</td>
                       <td>{address.nearAddress}</td>
                       <td className="text-center">{address.nearAmount}</td>
-                      <td className="text-center"><button className="btn btn-link btn-primary"><i className="tim-icons icon-simple-remove"></i></button></td>
+                      <td className="text-center"><button value={address.nearAddress} className="btn btn-link btn-primary" onClick={(e) => remove(e)}><i className="tim-icons icon-simple-remove"></i></button></td>
                     </tr>
                   )}
                 </tbody>

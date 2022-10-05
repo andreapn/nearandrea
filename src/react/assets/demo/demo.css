@@ -223,6 +223,7 @@
     height: 640px;
     overflow: hidden;
   }
+
   .parallax .parallax-image img {
     height: 100%;
     width: auto;
@@ -286,10 +287,12 @@
 }
 
 @media (max-width: 768px) {
+
   .btn,
   .btn-morphing {
     margin-bottom: 10px;
   }
+
   .parallax .motto {
     top: 170px;
     margin-top: 0;
@@ -429,7 +432,7 @@
 }
 
 .brand .h1-seo {
-  font-size: 5em;
+  font-size: 3.5em;
   text-transform: uppercase;
   font-weight: 300;
 }
