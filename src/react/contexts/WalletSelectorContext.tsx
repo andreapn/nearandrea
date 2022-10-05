@@ -31,7 +31,7 @@ import {
   UncontrolledTooltip,
   Label
 } from "reactstrap";
-import { providers } from "near-api-js";
+import { providers, utils } from "near-api-js";
 import type { AccountView } from "near-api-js/lib/providers/provider";
 import SignIn from "../components/SignIn";
 import type { Account } from "../interfaces";
@@ -290,7 +290,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
               <NavItem className="p-0">
                 <NavLink
                   data-placement="bottom"
-                  href="https://twitter.com/CreativeTim"
+                  href="#"
                   rel="noopener noreferrer"
                   target="_blank"
                   title="Follow us on Twitter"
@@ -302,7 +302,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
               <NavItem className="p-0">
                 <NavLink
                   data-placement="bottom"
-                  href="https://www.facebook.com/CreativeTim"
+                  href="#"
                   rel="noopener noreferrer"
                   target="_blank"
                   title="Like us on Facebook"
@@ -314,7 +314,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
               <NavItem className="p-0">
                 <NavLink
                   data-placement="bottom"
-                  href="https://www.instagram.com/CreativeTimOfficial"
+                  href="#"
                   rel="noopener noreferrer"
                   target="_blank"
                   title="Follow us on Instagram"
@@ -334,7 +334,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                   onClick={(e) => e.preventDefault()}
                 >
                   <i className="fa fa-cogs d-lg-none d-xl-none" />
-                  Getting started
+                  Category
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-with-icons">
                   <Link href="/">
@@ -346,7 +346,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                   <Link href="/multisend">
                     <DropdownItem>
                       <i className="tim-icons icon-paper" />
-                      Multi Send
+                      Multi-send
                     </DropdownItem>
                   </Link>
                   <Link href="/about">
@@ -358,7 +358,9 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                 </DropdownMenu>
               </UncontrolledDropdown>
               <NavItem className="p-2">
-                <p>{accountId}</p>
+                <p>{accountId}
+                  {/* <span hidden={!accountId}>{utils.format.formatNearAmount(account ? account.amount : "0", 2)} Ⓝ</span> */}
+                </p>
               </NavItem>
 
               <NavItem hidden={!!accountId}>

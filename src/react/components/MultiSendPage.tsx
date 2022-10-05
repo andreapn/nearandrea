@@ -5,6 +5,7 @@ import { useWalletSelector } from "../contexts/WalletSelectorContext";
 import {
   AccountView, CodeResult,
 } from "near-api-js/lib/providers/provider";
+import image from "../public/logo-multisend.png";
 
 // reactstrap components
 import {
@@ -205,13 +206,28 @@ const MultiSendPage: React.FC = () => {
   }
 
   return (
-    <div className="section section-basic" id="basic-elements">
+    <div className="section section-signup">
       <Container>
+        <div className="squares square-1" />
+        <div className="squares square-2" />
+        {/* <div className="squares square-3" /> */}
+        <div className="squares square-4" />
         <Form onSubmit={(e) => addAddress(e as unknown as SubmitEvent)}>
           <fieldset disabled={display}>
+
+            <Row className="justify-content-md-center">
+              <Col sm="8" className="text-center">
+                <img
+                  alt="..."
+                  className="img-fluid rounded shadow"
+                  src={image.src}
+                  style={{ width: "300px" }}
+                />
+              </Col>
+            </Row>
             <Row className="justify-content-md-center">
               <Col sm="8">
-                <p className="category">NEAR Address:</p>
+                <p className="default">NEAR Address:</p>
               </Col>
             </Row>
             <Row className="justify-content-md-center">
@@ -228,7 +244,7 @@ const MultiSendPage: React.FC = () => {
             </Row>
             <Row className="justify-content-md-center">
               <Col sm="8">
-                <p className="category">Amount NEAR:</p>
+                <p className="default">Amount NEAR:</p>
               </Col>
             </Row>
             <Row className="justify-content-md-center">
@@ -248,16 +264,16 @@ const MultiSendPage: React.FC = () => {
                 </FormGroup>
               </Col>
             </Row>
-            <Row className="justify-content-md-center">
+            <Row className="justify-content-center">
               <Col sm="8">
                 <Button color="default" type="submit">
-                  Add Address
+                  <i className="tim-icons icon-components" /> Add
                 </Button>
                 <Button color="default" type="button" onClick={() => clear()}>
-                  Clear
+                  <i className="tim-icons icon-simple-remove" /> Clear
                 </Button>
                 <Button color="primary" type="button" onClick={() => handleSubmitSend()}>
-                  Send
+                  <i className="tim-icons icon-send" /> Send
                 </Button>
               </Col>
             </Row></fieldset>
@@ -266,19 +282,19 @@ const MultiSendPage: React.FC = () => {
               <Table className="table" hidden={addressList.length === 0}>
                 <thead>
                   <tr>
-                    <th>No</th>
-                    <th>NEAR Address</th>
-                    <th>Amount NEAR</th>
-                    <th>Action</th>
+                    <th className="text-center">No</th>
+                    <th>Ⓝ Address</th>
+                    <th className="text-center">Amount Ⓝ</th>
+                    <th className="text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {addressList.map((address, i) =>
                     <tr key={i}>
-                      <td>{i + 1}</td>
+                      <td className="text-center">{i + 1}</td>
                       <td>{address.nearAddress}</td>
-                      <td>{address.nearAmount}</td>
-                      <td><Button value={address.nearAddress} onClick={remove}>X</Button></td>
+                      <td className="text-center">{address.nearAmount}</td>
+                      <td className="text-center"><button className="btn btn-link btn-primary"><i className="tim-icons icon-simple-remove"></i></button></td>
                     </tr>
                   )}
                 </tbody>

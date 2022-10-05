@@ -12,10 +12,9 @@ export default function PageHeader() {
       <div className="squares square7" />
       <div>
         <div className="content-center brand">
-          <h1 className="h1-seo">BLK• React</h1>
+          <h1 className="h1-seo">NEARANDREA</h1>
           <h3 className="d-none d-sm-block">
-            A beautiful Design System for Bootstrap 4 (reactstrap) and React.
-            It's Free and Open Source.
+            Bring convenience to NEAR users.
           </h3>
         </div>
       </div>

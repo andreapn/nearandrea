@@ -42,10 +42,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href={favicon.src} />
-        <link
+        {/* <link
           href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800"
           rel="stylesheet"
-        />
+        /> */}
         <link
           href="https://use.fontawesome.com/releases/v5.0.6/css/all.css"
           rel="stylesheet"

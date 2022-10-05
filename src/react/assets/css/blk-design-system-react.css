@@ -19571,6 +19571,18 @@ textarea.form-control:active {
   height: 100vh;
 }
 
+.page-header .content-center.brand .h1-seo,
+.page-header .content-center.brand h3 {
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.page-header .content-center.brand .h1-seo span,
+.page-header .content-center.brand h3 span {
+  font-weight: 600;
+}
+
 .index-page .page-header .container>.content-center.brand .h1-seo,
 .index-page .page-header .container>.content-center.brand h3 {
   color: #ffffff;
