@@ -255,6 +255,17 @@ table {
   border-collapse: collapse;
 }
 
+table.table {
+  border-bottom: hidden !important;
+  border-top: hidden !important;
+}
+
+table.table th,
+td {
+  /* border-bottom: hidden; */
+  border-top: hidden !important;
+}
+
 caption {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -17485,6 +17496,10 @@ h2,
   line-height: 1.2;
 }
 
+.content h3 {
+  margin-bottom: 0.5rem;
+}
+
 h3,
 .h3 {
   margin-bottom: 30px;
@@ -17523,6 +17538,11 @@ p {
 
 p.description {
   font-size: 1.14em;
+}
+
+.content .title {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .title {

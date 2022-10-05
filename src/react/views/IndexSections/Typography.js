@@ -22,12 +22,12 @@ import { Container, Row, Col } from "reactstrap";
 export default function Typography() {
   return (
     <div className="section section-typo">
-      <img alt="..." className="path" src={require("../../assets/img/path1.png")} />
-      <img
+      {/* <img alt="..." className="path" src={require("../../assets/img/path1.png")} /> */}
+      {/* <img
         alt="..."
         className="path path1"
         src={require("../../assets/img/path3.png")}
-      />
+      /> */}
       <Container>
         <h3 className="title">Typography</h3>
         <div id="typography">

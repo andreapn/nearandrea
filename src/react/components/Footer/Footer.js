@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 
 const Footer = () => {
-  return (<>ABC</>);
+  return (<></>);
 }
 
 export default Footer;

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "./styles.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import favicon from "../public/favicon.ico";
@@ -42,6 +42,14 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href={favicon.src} />
+        <link
+          href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800"
+          rel="stylesheet"
+        />
+        <link
+          href="https://use.fontawesome.com/releases/v5.0.6/css/all.css"
+          rel="stylesheet"
+        />
         <title>NEARANDREA</title>
         <meta property="og:title" content="NEARANDREA" />
         <meta
@@ -49,27 +57,28 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="NEARANDREA"
         />
       </Head>
-      <IndexNavbar />
-      <div className="wrapper">
-        <PageHeader />
-        <div className="main">
-          <WalletSelectorContextProvider>
+      {/* <IndexNavbar /> */}
+      <WalletSelectorContextProvider>
+        <div className="wrapper">
+
+          <div className="main">
+
             <Component {...pageProps} />
-          </WalletSelectorContextProvider>
-          <Basics />
-          <Navbars />
-          <Tabs />
-          <Pagination />
-          <Notifications />
-          <Typography />
-          {/* <JavaScript /> */}
-          <NucleoIcons />
-          <Signup />
-          <Examples />
-          <Download />
+            {/* <Basics /> */}
+            {/* <Navbars /> */}
+            {/* <Tabs /> */}
+            {/* <Pagination /> */}
+            {/* <Notifications /> */}
+            {/* <Typography /> */}
+            {/* <JavaScript /> */}
+            {/* <NucleoIcons /> */}
+            {/* <Signup /> */}
+            {/* <Examples /> */}
+            {/* <Download /> */}
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
+      </WalletSelectorContextProvider>
     </div>
   );
 }

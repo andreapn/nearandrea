@@ -55,7 +55,7 @@ export default function Basics() {
   }, []);
   return (
     <div className="section section-basic" id="basic-elements">
-      <img alt="..." className="path" src={require("../../assets/img/path1.png")} />
+      {/* <img alt="..." className="path" src={require("../../assets/img/path1.png")} /> */}
       <Container>
         <h2 className="title">Basic Elements</h2>
         <h3>Buttons</h3>

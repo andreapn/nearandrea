@@ -36,12 +36,12 @@ export default function PaginationSection() {
   const [pills, setPills] = React.useState(1);
   return (
     <div className="section section-pagination">
-      <img alt="..." className="path" src={require("../../assets/img/path4.png")} />
-      <img
+      {/* <img alt="..." className="path" src={require("../../assets/img/path4.png")} /> */}
+      {/* <img
         alt="..."
         className="path path1"
         src={require("../../assets/img/path5.png")}
-      />
+      /> */}
       <Container>
         <Row>
           <Col md="6">

@@ -7,11 +7,12 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/router'
 import AboutPage from '../components/AboutPage';
+import Basics from '../views/IndexSections/Basics';
 
 const About: NextPage = () => {
     return (
         <Fragment>
-            <AboutPage />
+            <Basics />
         </Fragment >
     )
 };
