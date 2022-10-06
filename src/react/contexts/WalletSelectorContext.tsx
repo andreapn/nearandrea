@@ -107,7 +107,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
-      network: "testnet",
+      network: "mainnet",
       debug: true,
       modules: [
         ...(await setupDefaultWallets()),
@@ -305,7 +305,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                   color="default"
                   onClick={handleSignIn}
                 >
-                  <i className="tim-icons icon-key-25" /> <span className="d-none d-sm-block">Login</span>
+                  <i className="tim-icons icon-key-25" /> <span>Login</span>
                 </Button>
               </NavItem>
 
@@ -315,7 +315,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                   color="default"
                   onClick={handleSwitchWallet}
                 >
-                  <i className="tim-icons icon-wallet-43" /> <span className="d-none d-sm-block">Switch Wallet</span>
+                  <i className="tim-icons icon-wallet-43" /> <span>Switch Wallet</span>
                 </Button>
               </NavItem>
 
@@ -325,7 +325,7 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
                   color="default"
                   onClick={handleSignOut}
                 >
-                  <i className="tim-icons icon-button-power" /> <span className="d-none d-sm-block">Log Out</span>
+                  <i className="tim-icons icon-button-power" /> <span>Log Out</span>
                 </Button>
               </NavItem>
             </Nav>

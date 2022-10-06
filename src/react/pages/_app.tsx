@@ -54,7 +54,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta property="og:title" content="NEARANDREA" />
         <meta
           property="og:description"
-          content="NEARANDREA"
+          content="NEARANDREA bring convenience to NEAR users."
         />
       </Head>
       {/* <IndexNavbar /> */}

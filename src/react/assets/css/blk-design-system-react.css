@@ -16958,6 +16958,7 @@ i.icon-key-25 {
     margin: 0;
     text-transform: uppercase;
     font-weight: 300;
+    margin-right: 10px;
   }
 
   .navbar .navbar-nav .btn span,
@@ -16965,7 +16966,7 @@ i.icon-key-25 {
   .navbar .navbar-nav .btn span:focus,
   .navbar .navbar-nav .btn span:active,
   .navbar .navbar-nav .btn span:active:focus {
-    color: #222a42 !important;
+    color: whitesmoke !important;
   }
 
   .navbar .navbar-nav a.nav-link i {

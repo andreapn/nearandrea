@@ -263,6 +263,7 @@ const MultiSendPage: React.FC = () => {
                   style={{ width: "300px" }}
                 />
                 <h1>NEAR MultiSend</h1>
+                <h5>{FEE}Ⓝ for 1 tx.</h5>
               </Col>
             </Row>
             <Row className="justify-content-md-center">
@@ -302,9 +303,9 @@ const MultiSendPage: React.FC = () => {
                     id="donation"
                     autoComplete="off"
                     defaultValue={"0"}
-                    // max={account ? Big(account.amount)
-                    //   .div(10 ** 24)
-                    //   .toString() : "0"}
+                    max={account ? Big(account.amount)
+                      .div(10 ** 24)
+                      .toString() : "100000"}
                     min="0"
                     step="0.01" />
                 </FormGroup>
