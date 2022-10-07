@@ -7,8 +7,8 @@ export interface Message {
 }
 
 export interface Address {
-  nearAddress: string;
-  nearAmount: number;
+  a: string;
+  b: number;
 }
 
 export type Account = AccountView & {

@@ -6,6 +6,7 @@ import {
   AccountView, CodeResult,
 } from "near-api-js/lib/providers/provider";
 import image from "../public/logo-multisend.png";
+import loadingGif from "../public/loading.gif";
 
 // reactstrap components
 import {
@@ -29,7 +30,9 @@ import { providers, utils } from "near-api-js";
 
 const DEFAULT_NEAR = "0";
 const FEE = 0.05;
-const BOATLOAD_OF_GAS = utils.format.parseNearAmount("0.00000000003")!;
+const BOATLOAD_OF_GAS_SMALL = utils.format.parseNearAmount("0.00000000003")!; // < 50 records
+const BOATLOAD_OF_GAS_MEDIUM = utils.format.parseNearAmount("0.0000000001")!; // < 150 records
+const BOATLOAD_OF_GAS_LARGE = utils.format.parseNearAmount("0.0000000003")!; // 1000 records
 
 const MultiSendPage: React.FC = () => {
   const [inputFocus, setInputFocus] = React.useState(false);
@@ -39,9 +42,12 @@ const MultiSendPage: React.FC = () => {
   const [display, setDisplay] = useState(false);
   const [modalShow, setModalShow] = useState(false);
   const [modalSuccessShow, setModalSuccessShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [sentNumber, setSentNumber] = useState(0);
+  const [csvFile, setCsvFile] = useState();
+  const fileReader = new FileReader();
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
     if (!accountId) {
@@ -100,14 +106,13 @@ const MultiSendPage: React.FC = () => {
     // Calculate total deposit from addressList
     let deposit: number = 0;
     addressList.forEach((address) => {
-      if (address.nearAmount) {
-        deposit += Number(address.nearAmount);
+      if (address.b) {
+        deposit += Number(address.b);
       }
     });
-    console.log(deposit);
     const jsonString = JSON.stringify(addressList)
-    console.log(jsonString);
-    setSentNumber(deposit);
+    // console.log(jsonString);
+
 
     // Sign wallet
     const wallet = await selector.wallet();
@@ -120,7 +125,11 @@ const MultiSendPage: React.FC = () => {
             params: {
               methodName: "multiSend",
               args: { listAddress: jsonString },
-              gas: BOATLOAD_OF_GAS,
+              gas: addressList.length >= 150 ?
+                BOATLOAD_OF_GAS_LARGE :
+                (addressList.length >= 50 && addressList.length < 150) ?
+                  BOATLOAD_OF_GAS_MEDIUM :
+                  BOATLOAD_OF_GAS_SMALL,
               deposit: utils.format.parseNearAmount((deposit + FEE).toString())!,
             },
           },
@@ -135,17 +144,18 @@ const MultiSendPage: React.FC = () => {
     setDisplay(true);
     try {
       const result = await submitSend();
-      const accountView = await getAccount();
-      setAccount(accountView);
-      setDisplay(false);
-      setAddressList([]);
-      onShowSuccess(true, "Sent successful!");
-      setSentNumber(0);
-      return result;
+      console.log("Result: ", result);
+      if (result) {
+        const accountView = await getAccount();
+        setAccount(accountView);
+        setAddressList([]);
+        setSentNumber(0);
+        setDisplay(false);
+        onShowSuccess(true, "Sent successful!");
+      }
     } catch (err: any) {
       setDisplay(false);
-      setError(err.message)
-      onShowAlert(true);
+      onShowAlert(true, err.message);
     }
   }, [submitSend]);
 
@@ -153,27 +163,31 @@ const MultiSendPage: React.FC = () => {
     let check: boolean = false;
     let currentDonation: number = 0;
     addressList.forEach((address): any => {
-      if (address.nearAddress === message) {
-        currentDonation = Number(address.nearAmount);
+      if (address.a === message) {
+        currentDonation = Number(address.b);
         check = true;
         return true;
       };
     })
 
     if (check) {
-      const newAddressList = addressList.filter((address) => { return address.nearAddress !== message })
+      const newAddressList = addressList.filter((address) => { return address.a !== message })
       const newDonation = Number(donation) + currentDonation;
-      newAddressList.push({ nearAddress: message, nearAmount: newDonation });
+      newAddressList.push({ a: message, b: newDonation });
       setAddressList(newAddressList);
     } else {
       setAddressList([
         ...addressList,
-        { nearAddress: message, nearAmount: donation }
+        { a: message, b: donation }
       ])
     }
+    // setTimeout(() => {
+    setSentNumber(Number(sentNumber) + Number(donation));
+    // }, 2000)
   };
 
-  const onShowAlert = (flag: boolean) => {
+  const onShowAlert = (flag: boolean, msg: string) => {
+    setError(msg);
     setModalShow(flag);
     window.setTimeout(() => {
       setModalShow(!flag);
@@ -204,17 +218,15 @@ const MultiSendPage: React.FC = () => {
               donation.value = DEFAULT_NEAR;
               message.focus();
               onShowSuccess(true, "Address added successful!");
+
             } else {
-              setError("Amount Ⓝ should not be 0.")
               message.value = "";
               donation.value = DEFAULT_NEAR;
               message.focus();
-              onShowAlert(true);
+              onShowAlert(true, "Amount Ⓝ should not be 0.");
             }
           }).catch((err) => {
-            console.log(err.message)
-            setError(err.message)
-            onShowAlert(true);
+            onShowAlert(true, err.message);
             message.value = "";
             donation.value = DEFAULT_NEAR;
             message.focus();
@@ -230,15 +242,83 @@ const MultiSendPage: React.FC = () => {
 
   const remove = (e: any) => {
     const value = e.currentTarget.value;
-    setAddressList(addressList.filter((address) => { return address.nearAddress !== value }))
-    setSentNumber(0);
+
+    const target = addressList.filter((address) => {
+      return address.a === value;
+    })[0];
+
+    setSentNumber(Number(sentNumber) - Number(target.b));
+
+    setAddressList(addressList.filter((address) => {
+      return address.a !== value;
+    }))
+
   }
 
-  // const scrollToDownload = () => {
-  //   document
-  //     .getElementById("download-section")
-  //     .scrollIntoView({ behavior: "smooth" });
-  // };
+  const handleOnChange = (e: any) => {
+    setCsvFile(e.target.files[0]);
+  };
+
+  const handleOnSubmitCsv = useCallback((e: any) => {
+    e.preventDefault();
+    // @ts-ignore.
+    const { fieldSubmitCsv, csvFileInput } = e.target.elements;
+    if (csvFile) {
+      fileReader.onload = function (event: any) {
+        const csvOutput = event.target.result;
+        csvFileToArray(csvOutput, fieldSubmitCsv);
+      };
+      fileReader.readAsText(csvFile)
+      csvFileInput.value = "";
+      setCsvFile(undefined);
+    }
+  }, [handleOnChange]);
+
+  const csvFileToArray = (str: string, fieldSubmitCsv: any) => {
+    if ((str.includes("\n") && str.includes(",")) || (str.includes("\n") && str.includes(";"))) {
+      const csvRows = str.split("\n");
+      const newAddressList = new Array<Address>();
+      // let errorAccount: string = "";
+      fieldSubmitCsv.disabled = true;
+      setLoading(true);
+      csvRows.map((row) => {
+        let part: string | any[] = [];
+        if (row.includes(",")) {
+          part = row.split(",");
+        } else if (row.includes(";")) {
+          part = row.split(";");
+        } else {
+          return;
+        }
+        if (part.length === 2 && !isNaN(Number(part[1]))) {
+          checkAccount(part[0])
+            .then((res) => {
+              newAddressList.push({
+                a: part[0], b: Number(part[1])
+              });
+            })
+            .catch((err) => {
+              return;
+            })
+        } else {
+          return;
+        }
+      })
+      window.setTimeout(() => {
+        let totalSend = 0;
+        newAddressList.forEach((a) => {
+          totalSend += Number(a.b);
+        });
+        setSentNumber(Number(totalSend));
+        setAddressList(newAddressList);
+        setLoading(false);
+        fieldSubmitCsv.disabled = false;
+        onShowSuccess(true, "Import successful!")
+      }, 2000);
+    } else {
+      onShowAlert(true, "CSV wrong format!");
+    }
+  };
 
   // if (!account) {
   //   return null;
@@ -260,7 +340,7 @@ const MultiSendPage: React.FC = () => {
                   alt="..."
                   className="img-fluid rounded"
                   src={image.src}
-                  style={{ width: "300px" }}
+                  style={{ width: "150px" }}
                 />
                 <h1>NEAR MultiSend</h1>
                 <h5>{FEE}Ⓝ for 1 tx.</h5>
@@ -268,7 +348,8 @@ const MultiSendPage: React.FC = () => {
             </Row>
             <Row className="justify-content-md-center">
               <Col sm="8">
-                <h4 className="text-primary" hidden={!accountId}>Current balance is <b className="text-success">{account ? utils.format.formatNearAmount(account.amount, 2) : 0}Ⓝ</b><span hidden={sentNumber === 0}>. You intend to send <b className="text-success"><span>{sentNumber}Ⓝ</span></b>, your fee is <b className="text-success">{FEE}Ⓝ</b>/tx.</span></h4>
+                <h4 className="text-primary" hidden={!accountId}>Current balance is <b className="text-success">{account ? utils.format.formatNearAmount(account.amount, 2) : 0}Ⓝ</b></h4>
+                <p><span>You intend to send <b className="text-success">{sentNumber}Ⓝ</b> to <b className="text-success">{addressList.length}</b> address.</span></p>
               </Col>
             </Row>
             <Row className="justify-content-md-center">
@@ -313,65 +394,99 @@ const MultiSendPage: React.FC = () => {
             </Row>
             <Row className="justify-content-center">
               <Col sm="8">
-                <Button color="default" type="submit">
+                <p className="text-primary">You can add by manual:</p>
+                <Button color="default" type="submit" size="sm">
                   <i className="tim-icons icon-simple-add" /> Add
                 </Button>
-                <Button color="default" disabled>
+                {/* <Button color="default" disabled>
                   <i className="tim-icons icon-single-copy-04" /> Import
-                </Button>
-                <Button color="default" type="button" onClick={() => clear()}>
+                </Button> */}
+                <Button color="default" type="button" onClick={() => clear()} size="sm">
                   <i className="tim-icons icon-simple-remove" /> Clear
                 </Button>
-                <Button color="primary" type="button" onClick={() => handleSubmitSend()}>
+                <Button color="primary" type="button" onClick={() => handleSubmitSend()} size="sm">
                   <i className="tim-icons icon-send" /> Send
                 </Button>
               </Col>
             </Row>
-            <Row className="justify-content-center">
-              <Col sm="8">
-                <UncontrolledAlert hidden={!modalShow} className="alert-with-icon" color="danger">
-                  <span data-notify="icon" className="tim-icons icon-bell-55" />
-                  <span>
-                    {error}
-                  </span>
-                </UncontrolledAlert>
-              </Col>
-              <Col sm="8">
-                <UncontrolledAlert hidden={!modalSuccessShow} className="alert-with-icon" color="success">
-                  <span data-notify="icon" className="tim-icons icon-satisfied" />
-                  <span>
-                    {success}
-                  </span>
-                </UncontrolledAlert>
-              </Col>
-            </Row>
-
           </fieldset>
+
+        </Form>
+        <Form onSubmit={(e) => {
+          handleOnSubmitCsv(e);
+        }}>
           <Row className="justify-content-md-center">
             <Col sm="8">
-              <Table className="table" hidden={addressList.length === 0}>
-                <thead>
-                  <tr>
-                    <th className="text-center">No</th>
-                    <th>Ⓝ Address</th>
-                    <th className="text-center">Amount Ⓝ</th>
-                    <th className="text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {addressList.map((address, i) =>
-                    <tr key={i}>
-                      <td className="text-center">{i + 1}</td>
-                      <td>{address.nearAddress}</td>
-                      <td className="text-center">{address.nearAmount}</td>
-                      <td className="text-center"><button value={address.nearAddress} className="btn btn-link btn-primary" onClick={(e) => remove(e)}><i className="tim-icons icon-simple-remove"></i></button></td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
+              <p className="text-primary">Or upload via CSV file (support <span className="text-success" >"," ";"</span> delimited), for example:</p>
+              <p className="text-success">
+                nearaddress01.near,1
+              </p>
+              <p className="text-success">
+                nearaddress02.near,10
+              </p>
+              <p className="text-primary">Currently CSV file just support lower 450 records.</p>
+              <fieldset id="fieldSubmitCsv">
+                <input
+                  color="default"
+                  id="csvFileInput"
+                  type={"file"}
+                  accept={".csv"}
+                  onChange={handleOnChange}
+                />
+                <Button color="default" type="submit" size="sm"><i hidden={loading} className="tim-icons icon-single-copy-04" />
+                  <img
+                    hidden={!loading}
+                    alt="..."
+                    className="img-fluid rounded"
+                    src={loadingGif.src}
+                    style={{ width: "17px" }}
+                  /> Import</Button>
+              </fieldset>
             </Col>
           </Row>
         </Form>
+        <Row className="justify-content-center">
+          <Col sm="8">
+            <UncontrolledAlert hidden={!modalShow} className="alert-with-icon" color="danger">
+              <span data-notify="icon" className="tim-icons icon-bell-55" />
+              <span>
+                {error}
+              </span>
+            </UncontrolledAlert>
+          </Col>
+          <Col sm="8">
+            <UncontrolledAlert hidden={!modalSuccessShow} className="alert-with-icon" color="success">
+              <span data-notify="icon" className="tim-icons icon-satisfied" />
+              <span>
+                {success}
+              </span>
+            </UncontrolledAlert>
+          </Col>
+        </Row>
+        <Row className="justify-content-md-center">
+          <Col sm="8">
+            <Table className="table" >
+              <thead>
+                <tr>
+                  <th className="text-center">No</th>
+                  <th>Ⓝ Address</th>
+                  <th className="text-center">Amount Ⓝ</th>
+                  <th className="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {addressList.map((address, i) =>
+                  <tr key={i}>
+                    <td className="text-center">{i + 1}</td>
+                    <td>{address.a}</td>
+                    <td className="text-center">{address.b}</td>
+                    <td className="text-center"><button value={address.a} className="btn btn-link btn-primary" onClick={(e) => remove(e)}><i className="tim-icons icon-simple-remove"></i></button></td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
       </Container>
     </div >
   );

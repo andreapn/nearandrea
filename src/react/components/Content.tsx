@@ -152,8 +152,8 @@ const Content: React.FC = () => {
     // Calculate total deposit from addressList
     let deposit: number = 0;
     addressList.forEach((address) => {
-      if (address.nearAmount) {
-        deposit += Number(address.nearAmount);
+      if (address.b) {
+        deposit += Number(address.b);
       }
     });
     console.log(deposit);
@@ -202,22 +202,22 @@ const Content: React.FC = () => {
     let check: boolean = false;
     let currentDonation: number = 0;
     addressList.forEach((address): any => {
-      if (address.nearAddress === message) {
-        currentDonation = Number(address.nearAmount);
+      if (address.a === message) {
+        currentDonation = Number(address.b);
         check = true;
         return true;
       };
     })
 
     if (check) {
-      const newAddressList = addressList.filter((address) => { return address.nearAddress !== message })
+      const newAddressList = addressList.filter((address) => { return address.a !== message })
       const newDonation = Number(donation) + currentDonation;
-      newAddressList.push({ nearAddress: message, nearAmount: newDonation });
+      newAddressList.push({ a: message, b: newDonation });
       setAddressList(newAddressList);
     } else {
       setAddressList([
         ...addressList,
-        { nearAddress: message, nearAmount: donation }
+        { a: message, b: donation }
       ])
     }
   };
@@ -257,7 +257,7 @@ const Content: React.FC = () => {
 
   const remove = (e: any) => {
     const value = e.currentTarget.value;
-    setAddressList(addressList.filter((address) => { return address.nearAddress !== value }))
+    setAddressList(addressList.filter((address) => { return address.a !== value }))
   }
 
   const printAddressList = () => {

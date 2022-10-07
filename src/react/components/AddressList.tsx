@@ -36,9 +36,9 @@ const AddressList: React.FC<AddressListProps> = ({ addressList, remove }) => {
                     {addressList.map((address, i) =>
                         <tr key={i}>
                             <td>{i + 1}</td>
-                            <td>{address.nearAddress}</td>
-                            <td>{address.nearAmount}</td>
-                            <td><Button value={address.nearAddress} onClick={remove}>X</Button></td>
+                            <td>{address.a}</td>
+                            <td>{address.b}</td>
+                            <td><Button value={address.a} onClick={remove}>X</Button></td>
                         </tr>
                     )}
                 </tbody>

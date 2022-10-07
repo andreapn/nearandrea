@@ -36,6 +36,7 @@ import type { AccountView } from "near-api-js/lib/providers/provider";
 import SignIn from "../components/SignIn";
 import type { Account } from "../interfaces";
 import Link from 'next/link';
+import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 
 declare global {
   interface Window {
@@ -107,24 +108,12 @@ export const WalletSelectorContextProvider: React.FC<Props> = ({
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
-      network: "mainnet",
+      network: "testnet",
       debug: true,
       modules: [
-        ...(await setupDefaultWallets()),
         setupNearWallet(),
-        setupSender(),
-        setupMathWallet(),
-        setupNightly(),
-        setupMeteorWallet(),
-        setupNightlyConnect({
-          url: "wss://relay.nightly.app/app",
-          appMetadata: {
-            additionalInfo: "",
-            application: "NEAR Wallet Selector",
-            description: "Example dApp used by NEAR Wallet Selector",
-            icon: "https://near.org/wp-content/uploads/2020/09/cropped-favicon-192x192.png",
-          },
-        }),
+        setupMyNearWallet(),
+        setupSender()
       ],
     });
     const _modal = setupModal(_selector, { contractId: CONTRACT_ID });
