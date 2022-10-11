@@ -19,3 +19,8 @@ export interface Donate {
   account_id: string;
   total_amount: string;
 }
+
+export interface Msg {
+  a: string;
+  b: Array<Address>;
+}

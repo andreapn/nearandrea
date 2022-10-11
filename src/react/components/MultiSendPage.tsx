@@ -25,14 +25,17 @@ import {
   Col,
   UncontrolledAlert
 } from "reactstrap";
-import { Account, Address } from "../interfaces";
+import { Account, Address, Msg } from "../interfaces";
 import { providers, utils } from "near-api-js";
+import { CONTRACT_ID } from "../constants";
+import { Transaction } from "@near-wallet-selector/core";
 
 const DEFAULT_NEAR = "0";
 const FEE = 0.05;
 const BOATLOAD_OF_GAS_SMALL = utils.format.parseNearAmount("0.00000000003")!; // < 50 records
 const BOATLOAD_OF_GAS_MEDIUM = utils.format.parseNearAmount("0.0000000001")!; // < 150 records
 const BOATLOAD_OF_GAS_LARGE = utils.format.parseNearAmount("0.0000000003")!; // 1000 records
+const ONE_YOCTO_NEAR = '0.000000000000000000000001';
 
 const MultiSendPage: React.FC = () => {
   const [inputFocus, setInputFocus] = React.useState(false);
@@ -320,9 +323,88 @@ const MultiSendPage: React.FC = () => {
     }
   };
 
-  // if (!account) {
-  //   return null;
-  // }
+  //test contract
+  const testContract = async () => {
+    const wallet = await selector.wallet();
+    try {
+      const transactions: Array<Transaction> = [];
+
+      addressList.forEach((a) => {
+        transactions.push({
+          signerId: accountId!,
+          receiverId: "usdn.testnet",
+          actions: [
+            {
+              type: "FunctionCall",
+              params: {
+                methodName: "ft_transfer",
+                args: {
+                  receiver_id: a.a,
+                  amount: Number(a.b * 10 ** 18).toString()
+                },
+                gas: BOATLOAD_OF_GAS_MEDIUM,
+                deposit: utils.format.parseNearAmount(ONE_YOCTO_NEAR)!,
+              },
+            },
+          ],
+        });
+      });
+
+      return wallet.signAndSendTransactions({ transactions }).catch((err) => {
+        console.log("Failed to add messages");
+        throw err;
+      });
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  //test contract
+  const testContract2 = async () => {
+    // Calculate total deposit from addressList
+    let deposit: number = 0;
+    addressList.forEach((address) => {
+      if (address.b) {
+        deposit += Number(address.b);
+      }
+    });
+    const msg: Msg = {
+      a: "dai.fakes.testnet",
+      b: addressList
+    }
+    const args = JSON.stringify(msg)
+
+    // Sign wallet
+    const wallet = await selector.wallet();
+    const amount = Number(FEE) + Number(ONE_YOCTO_NEAR);
+    try {
+      return wallet.signAndSendTransaction({
+        signerId: accountId!,
+        receiverId: msg.a,
+        actions: [
+          {
+            type: "FunctionCall",
+            params: {
+              methodName: "ft_transfer_call",
+              args: {
+                receiver_id: CONTRACT_ID,
+                amount: Number(deposit * 10 ** 18).toString(),
+                msg: args
+              },
+              gas: BOATLOAD_OF_GAS_LARGE,
+              deposit: utils.format.parseNearAmount(ONE_YOCTO_NEAR)!,
+            },
+          },
+        ],
+      });
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const printUtils = () => {
+    console.log(utils.format.parseNearAmount(ONE_YOCTO_NEAR));
+  }
 
   return (
     <div className="section section-signup">
@@ -406,6 +488,9 @@ const MultiSendPage: React.FC = () => {
                 </Button>
                 <Button color="primary" type="button" onClick={() => handleSubmitSend()} size="sm">
                   <i className="tim-icons icon-send" /> Send
+                </Button>
+                <Button color="primary" type="button" onClick={() => testContract2()} size="sm">
+                  <i className="tim-icons icon-send" /> Test
                 </Button>
               </Col>
             </Row>
