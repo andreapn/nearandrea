@@ -85,6 +85,7 @@ const MultiSendPage: React.FC = () => {
     });
   }, [accountId, getAccount]);
 
+  // Check account exist or not
   const checkAccount = useCallback((nearAccount: string) => {
     const { network } = selector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
@@ -323,62 +324,42 @@ const MultiSendPage: React.FC = () => {
     }
   };
 
-  //test contract
-  const testContract = async () => {
-    const wallet = await selector.wallet();
+  //send non-near token
+  const sendNonNearToken = async () => {
     try {
       const transactions: Array<Transaction> = [];
-
-      addressList.forEach((a) => {
-        transactions.push({
-          signerId: accountId!,
-          receiverId: "usdn.testnet",
-          actions: [
-            {
-              type: "FunctionCall",
-              params: {
-                methodName: "ft_transfer",
-                args: {
-                  receiver_id: a.a,
-                  amount: Number(a.b * 10 ** 18).toString()
-                },
-                gas: BOATLOAD_OF_GAS_MEDIUM,
-                deposit: utils.format.parseNearAmount(ONE_YOCTO_NEAR)!,
-              },
+      transactions.push({
+        signerId: accountId!,
+        receiverId: CONTRACT_ID,
+        actions: [
+          {
+            type: "FunctionCall",
+            params: {
+              methodName: "deposit",
+              args: {},
+              gas: BOATLOAD_OF_GAS_SMALL,
+              deposit: utils.format.parseNearAmount(FEE.toString())!,
             },
-          ],
-        });
+          },
+        ],
       });
 
-      return wallet.signAndSendTransactions({ transactions }).catch((err) => {
-        console.log("Failed to add messages");
-        throw err;
+      // Calculate total deposit from addressList
+      let deposit: number = 0;
+      addressList.forEach((address) => {
+        if (address.b) {
+          deposit += Number(address.b);
+        }
       });
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  //test contract
-  const testContract2 = async () => {
-    // Calculate total deposit from addressList
-    let deposit: number = 0;
-    addressList.forEach((address) => {
-      if (address.b) {
-        deposit += Number(address.b);
+      const msg: Msg = {
+        a: "wrap.testnet",
+        b: 24,
+        c: addressList,
       }
-    });
-    const msg: Msg = {
-      a: "dai.fakes.testnet",
-      b: addressList
-    }
-    const args = JSON.stringify(msg)
 
-    // Sign wallet
-    const wallet = await selector.wallet();
-    const amount = Number(FEE) + Number(ONE_YOCTO_NEAR);
-    try {
-      return wallet.signAndSendTransaction({
+      const amountSend: string = BigInt(Number(deposit) * 10 ** Number(msg.b)).toString();
+      const args = JSON.stringify(msg)
+      transactions.push({
         signerId: accountId!,
         receiverId: msg.a,
         actions: [
@@ -388,7 +369,7 @@ const MultiSendPage: React.FC = () => {
               methodName: "ft_transfer_call",
               args: {
                 receiver_id: CONTRACT_ID,
-                amount: Number(deposit * 10 ** 18).toString(),
+                amount: amountSend,
                 msg: args
               },
               gas: BOATLOAD_OF_GAS_LARGE,
@@ -396,6 +377,14 @@ const MultiSendPage: React.FC = () => {
             },
           },
         ],
+      });
+
+      // Sign wallet
+      const wallet = await selector.wallet();
+      // const amount = Number(FEE) + Number(ONE_YOCTO_NEAR);
+      return wallet.signAndSendTransactions({ transactions }).catch((err) => {
+        console.log("Failed to add messages");
+        throw err;
       });
     } catch (err) {
       throw err;
@@ -489,7 +478,7 @@ const MultiSendPage: React.FC = () => {
                 <Button color="primary" type="button" onClick={() => handleSubmitSend()} size="sm">
                   <i className="tim-icons icon-send" /> Send
                 </Button>
-                <Button color="primary" type="button" onClick={() => testContract2()} size="sm">
+                <Button color="primary" type="button" onClick={() => sendNonNearToken()} size="sm">
                   <i className="tim-icons icon-send" /> Test
                 </Button>
               </Col>

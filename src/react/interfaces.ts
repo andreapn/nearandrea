@@ -22,5 +22,6 @@ export interface Donate {
 
 export interface Msg {
   a: string;
-  b: Array<Address>;
+  b: number;
+  c: Array<Address>;
 }
